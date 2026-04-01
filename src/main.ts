@@ -119,6 +119,13 @@ client.on("clientReady", () => {
   console.log(`   Servers: ${client.guilds.cache.size}`);
   console.log("\n✨ Bot is ready! Try using /verse, /daily, /random, or /help");
 
+  // Set bot status
+  client.user?.setPresence({
+    activities: [{ name: "Property of euxaristia" }],
+    status: "online",
+  });
+  console.log("   Status: Property of euxaristia");
+
   // Start daily verse scheduler
   scheduler.start();
 });
