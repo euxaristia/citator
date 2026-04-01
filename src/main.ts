@@ -21,6 +21,29 @@ if (!CITATOR_DISCORD_TOKEN) {
   Deno.exit(1);
 }
 
+// Get client ID from env or fetch from API
+let clientId = CITATOR_CLIENT_ID;
+if (!clientId) {
+  console.log("⏳ No CITATOR_CLIENT_ID provided, fetching from Discord API...");
+  try {
+    const response = await fetch("https://discord.com/api/v10/users/@me", {
+      headers: {
+        Authorization: `Bot ${CITATOR_DISCORD_TOKEN}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch client ID: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    clientId = data.id;
+    console.log(`✅ Found client ID: ${clientId}`);
+  } catch (error) {
+    console.error("❌ Failed to fetch client ID:", error);
+    console.error("   Please set CITATOR_CLIENT_ID environment variable");
+    Deno.exit(1);
+  }
+}
+
 // Initialize services
 const bibleService = new BibleService(DEFAULT_VERSION);
 const commandHandlers = createCommandHandlers(bibleService);
@@ -28,6 +51,7 @@ const commandHandlers = createCommandHandlers(bibleService);
 // Create Discord client
 const client = new Client({
   token: CITATOR_DISCORD_TOKEN,
+  applicationId: clientId,
 });
 
 // Track channels for daily verses (in production, you'd want to persist this)
