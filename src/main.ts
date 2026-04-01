@@ -185,7 +185,7 @@ client.on("guildMemberAdd", async (member) => {
 
 // Connect to Discord
 try {
-  await client.connect();
+  await client.login(CITATOR_DISCORD_TOKEN);
   console.log("✅ Connected to Discord");
 } catch (error) {
   console.error("❌ Failed to connect to Discord:", error);
