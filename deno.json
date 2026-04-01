@@ -10,9 +10,7 @@
   "imports": {
     "@discordjs/core": "npm:@discordjs/core@^1.2.0",
     "@discordjs/rest": "npm:@discordjs/rest@^2.3.0",
-    "discord-api-types": "npm:discord-api-types@^0.37.83",
-    "std/dotenv": "jsr:@std/dotenv@^0.225.2",
-    "std/encoding": "jsr:@std/encoding@^1.0.5"
+    "discord-api-types": "npm:discord-api-types@^0.37.83"
   },
   "compilerOptions": {
     "strict": true,

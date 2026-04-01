@@ -3,13 +3,9 @@
  * Register the bot's slash commands with Discord
  */
 
-import { load } from "std/dotenv/mod.ts";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
 import { createCommandDefinitions } from "./commands/commands.ts";
-
-// Load environment variables
-const env = await load({ export: true });
 
 const CITATOR_DISCORD_TOKEN = Deno.env.get("CITATOR_DISCORD_TOKEN");
 const CITATOR_CLIENT_ID = Deno.env.get("CITATOR_CLIENT_ID");

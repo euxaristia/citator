@@ -5,14 +5,10 @@
  * Scripture from your Discord client to your heart ❤️
  */
 
-import { load } from "std/dotenv/mod.ts";
 import { Client } from "@discordjs/core";
 import { BibleService } from "./services/bible.ts";
 import { DailyVerseScheduler } from "./services/scheduler.ts";
 import { createCommandHandlers } from "./commands/commands.ts";
-
-// Load environment variables
-const env = await load({ export: true });
 
 const CITATOR_DISCORD_TOKEN = Deno.env.get("CITATOR_DISCORD_TOKEN");
 const CITATOR_CLIENT_ID = Deno.env.get("CITATOR_CLIENT_ID");

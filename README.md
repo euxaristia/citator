@@ -39,23 +39,23 @@ A Discord Bible bot built with **Deno** - delivers scripture directly from your 
 ### 2. Clone and Configure
 
 ```bash
-cd deno-biblebot
-
-# Copy environment template
-cp .env.example .env
-
-# Edit .env with your values
+cd citator
 ```
 
-### 3. Edit `.env` file
+### 3. Set environment variables
 
-```env
-CITATOR_DISCORD_TOKEN=your_bot_token_here
-CITATOR_CLIENT_ID=your_client_id_here
-CITATOR_GUILD_ID=your_guild_id_here  # Optional: for faster command testing
-DAILY_VERSE_SCHEDULE="0 8 * * *"     # 8:00 AM daily
-DEFAULT_VERSION=ESV
-TIMEZONE=America/New_York
+```bash
+export CITATOR_DISCORD_TOKEN=your_bot_token_here
+export CITATOR_CLIENT_ID=your_client_id_here
+export CITATOR_GUILD_ID=your_guild_id_here  # Optional: for faster command testing
+export DAILY_VERSE_SCHEDULE="0 8 * * *"     # 8:00 AM daily
+export DEFAULT_VERSION=ESV
+export TIMEZONE=America/New_York
+```
+
+Or run with inline variables:
+```bash
+CITATOR_DISCORD_TOKEN=xxx CITATOR_CLIENT_ID=xxx deno task start
 ```
 
 ### 4. Deploy Slash Commands
