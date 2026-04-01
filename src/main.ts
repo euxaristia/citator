@@ -14,16 +14,16 @@ import { createCommandHandlers } from "./commands/commands.ts";
 // Load environment variables
 const env = await load({ export: true });
 
-const DISCORD_TOKEN = Deno.env.get("DISCORD_TOKEN");
-const DISCORD_CLIENT_ID = Deno.env.get("DISCORD_CLIENT_ID");
+const CITATOR_DISCORD_TOKEN = Deno.env.get("CITATOR_DISCORD_TOKEN");
+const CITATOR_CLIENT_ID = Deno.env.get("CITATOR_CLIENT_ID");
 const DAILY_VERSE_SCHEDULE = Deno.env.get("DAILY_VERSE_SCHEDULE") || "0 8 * * *";
 const DEFAULT_VERSION = Deno.env.get("DEFAULT_VERSION") || "ESV";
 const TIMEZONE = Deno.env.get("TIMEZONE") || "America/New_York";
 
-if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID) {
+if (!CITATOR_DISCORD_TOKEN || !CITATOR_CLIENT_ID) {
   console.error("❌ Missing required environment variables:");
-  console.error("   - DISCORD_TOKEN");
-  console.error("   - DISCORD_CLIENT_ID");
+  console.error("   - CITATOR_DISCORD_TOKEN");
+  console.error("   - CITATOR_CLIENT_ID");
   console.error("\nPlease copy .env.example to .env and fill in your values.");
   Deno.exit(1);
 }
@@ -34,7 +34,7 @@ const commandHandlers = createCommandHandlers(bibleService);
 
 // Create Discord client
 const client = new Client({
-  token: DISCORD_TOKEN,
+  token: CITATOR_DISCORD_TOKEN,
 });
 
 // Track channels for daily verses (in production, you'd want to persist this)

@@ -49,9 +49,9 @@ cp .env.example .env
 ### 3. Edit `.env` file
 
 ```env
-DISCORD_TOKEN=your_bot_token_here
-DISCORD_CLIENT_ID=your_client_id_here
-DISCORD_GUILD_ID=your_guild_id_here  # Optional: for faster command testing
+CITATOR_DISCORD_TOKEN=your_bot_token_here
+CITATOR_CLIENT_ID=your_client_id_here
+CITATOR_GUILD_ID=your_guild_id_here  # Optional: for faster command testing
 DAILY_VERSE_SCHEDULE="0 8 * * *"     # 8:00 AM daily
 DEFAULT_VERSION=ESV
 TIMEZONE=America/New_York
@@ -101,9 +101,9 @@ Supported formats:
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `DISCORD_TOKEN` | ✅ | - | Your Discord bot token |
-| `DISCORD_CLIENT_ID` | ✅ | - | Your application's client ID |
-| `DISCORD_GUILD_ID` | ❌ | - | Guild ID for testing (commands appear instantly) |
+| `CITATOR_DISCORD_TOKEN` | ✅ | - | Your Discord bot token |
+| `CITATOR_CLIENT_ID` | ✅ | - | Your application's client ID |
+| `CITATOR_GUILD_ID` | ❌ | - | Guild ID for testing (commands appear instantly) |
 | `DAILY_VERSE_SCHEDULE` | ❌ | `0 8 * * *` | Cron-like schedule for daily verses |
 | `DEFAULT_VERSION` | ❌ | `ESV` | Default Bible version |
 | `TIMEZONE` | ❌ | `America/New_York` | Timezone for daily verse schedule |

@@ -11,17 +11,17 @@ import { createCommandDefinitions } from "./commands/commands.ts";
 // Load environment variables
 const env = await load({ export: true });
 
-const DISCORD_TOKEN = Deno.env.get("DISCORD_TOKEN");
-const DISCORD_CLIENT_ID = Deno.env.get("DISCORD_CLIENT_ID");
-const DISCORD_GUILD_ID = Deno.env.get("DISCORD_GUILD_ID");
+const CITATOR_DISCORD_TOKEN = Deno.env.get("CITATOR_DISCORD_TOKEN");
+const CITATOR_CLIENT_ID = Deno.env.get("CITATOR_CLIENT_ID");
+const CITATOR_GUILD_ID = Deno.env.get("CITATOR_GUILD_ID");
 
-if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID) {
-  console.error("❌ Missing DISCORD_TOKEN or DISCORD_CLIENT_ID in environment");
+if (!CITATOR_DISCORD_TOKEN || !CITATOR_CLIENT_ID) {
+  console.error("❌ Missing CITATOR_DISCORD_TOKEN or CITATOR_CLIENT_ID in environment");
   Deno.exit(1);
 }
 
 // Create REST client
-const rest = new REST({ version: "10" }).setToken(DISCORD_TOKEN);
+const rest = new REST({ version: "10" }).setToken(CITATOR_DISCORD_TOKEN);
 
 // Get commands
 const commands = createCommandDefinitions();
@@ -29,21 +29,21 @@ const commands = createCommandDefinitions();
 try {
   console.log("📝 Started refreshing application (/) commands.");
 
-  if (DISCORD_GUILD_ID) {
+  if (CITATOR_GUILD_ID) {
     // Guild-specific commands (faster for testing)
     const responseData = await rest.put(
-      Routes.applicationGuildCommands(DISCORD_CLIENT_ID, DISCORD_GUILD_ID),
+      Routes.applicationGuildCommands(CITATOR_CLIENT_ID, CITATOR_GUILD_ID),
       { body: commands }
     );
     console.log(
       `✅ Successfully registered ${
         (responseData as any[]).length
-      } guild commands for guild ${DISCORD_GUILD_ID}`
+      } guild commands for guild ${CITATOR_GUILD_ID}`
     );
   } else {
     // Global commands
     const responseData = await rest.put(
-      Routes.applicationCommands(DISCORD_CLIENT_ID),
+      Routes.applicationCommands(CITATOR_CLIENT_ID),
       { body: commands }
     );
     console.log(
