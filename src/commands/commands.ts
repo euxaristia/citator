@@ -16,15 +16,12 @@ export interface CommandHandler {
  */
 export function createCommandDefinitions(): any[] {
   const versions: APIApplicationCommandOptionChoice<string>[] = [
-    { name: "ESV (English Standard Version)", value: "ESV" },
     { name: "KJV (King James Version)", value: "KJV" },
-    { name: "NIV (New International Version)", value: "NIV" },
-    { name: "NASB (New American Standard Bible)", value: "NASB" },
     { name: "WEB (World English Bible)", value: "WEB" },
+    { name: "BBE (Bible in Basic English)", value: "BBE" },
     { name: "DRB (Douay-Rheims Bible)", value: "DRB" },
     { name: "WMB (World Messianic Bible)", value: "WMB" },
-    { name: "WMBBE (World Messianic Bible British Edition)", value: "WMBBE" },
-    { name: "BBE (Bible in Basic English)", value: "BBE" },
+    { name: "WMBBE (WMB British Edition)", value: "WMBBE" },
   ];
 
   return [
@@ -237,15 +234,12 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
       execute: async () => {
         const versions = [
           "**📚 Available Bible Versions:**\n",
-          "• **ESV** - English Standard Version",
           "• **KJV** - King James Version",
-          "• **NIV** - New International Version",
-          "• **NASB** - New American Standard Bible",
           "• **WEB** - World English Bible",
+          "• **BBE** - Bible in Basic English",
           "• **DRB** - Douay-Rheims Bible",
           "• **WMB** - World Messianic Bible",
           "• **WMBBE** - World Messianic Bible (British Edition)",
-          "• **BBE** - Bible in Basic English",
           "\n*Use `/verse` with the version parameter to specify a translation.*",
         ].join("\n");
 
@@ -257,12 +251,12 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
       description: "Show help information and available commands",
       execute: async () => {
         const helpText = [
-          "**📖 BibleBot Help**",
+          "**📖 Citator Help**",
           "",
           "**Available Commands:**",
           "• `/verse <reference> [version]` - Get a specific Bible verse",
-          "  Example: `/verse John 3:16 ESV`",
-          "  Example: `/verse Psalm 23:1-6 KJV`",
+          "  Example: `/verse John 3:16 KJV`",
+          "  Example: `/verse Psalm 23:1-6 WEB`",
           "",
           "• `/daily` - Get the verse of the day",
           "",
@@ -272,7 +266,7 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
           "",
           "• `/help` - Show this help message",
           "",
-          "**Supported Versions:** ESV, KJV, NIV, NASB, WEB, DRB, WMB, WMBBE, BBE",
+          "**Supported Versions:** KJV, WEB, BBE, DRB, WMB, WMBBE",
           "",
           "*Scripture from your Discord client to your heart* ❤️",
         ].join("\n");

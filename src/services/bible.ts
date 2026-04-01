@@ -165,8 +165,8 @@ export class BibleService {
    * Note: bible-api.com doesn't have a /translations endpoint, so we return known versions
    */
   async getVersions(): Promise<string[]> {
-    // Return known versions since the API doesn't provide an endpoint
-    return ["KJV", "ESV", "WEB", "BBE", "DRB", "WMB", "WMBBE"];
+    // Return known versions supported by bible-api.com
+    return ["KJV", "WEB", "BBE", "DRB", "WMB", "WMBBE"];
   }
 
   /**

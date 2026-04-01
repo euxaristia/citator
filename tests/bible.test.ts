@@ -181,7 +181,8 @@ Deno.test("BibleService - getVersions - returns array", async () => {
   
   assertEquals(Array.isArray(versions), true);
   assertEquals(versions.includes("KJV"), true);
-  assertEquals(versions.includes("ESV"), true);
+  assertEquals(versions.includes("WEB"), true);
+  assertEquals(versions.includes("BBE"), true);
 });
 
 Deno.test("BibleService - search - throws error", async () => {

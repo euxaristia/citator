@@ -149,8 +149,8 @@ Deno.test("CommandHandler - versions - returns list", async () => {
   const result = await versionsHandler.execute({});
   
   assertEquals(result.includes("KJV"), true);
-  assertEquals(result.includes("ESV"), true);
-  assertEquals(result.includes("NIV"), true);
+  assertEquals(result.includes("WEB"), true);
+  assertEquals(result.includes("BBE"), true);
 });
 
 Deno.test("CommandHandler - help - returns help text", async () => {
@@ -162,7 +162,7 @@ Deno.test("CommandHandler - help - returns help text", async () => {
   
   const result = await helpHandler.execute({});
   
-  assertEquals(result.includes("BibleBot Help"), true);
+  assertEquals(result.includes("Citator Help"), true);
   assertEquals(result.includes("/verse"), true);
   assertEquals(result.includes("/daily"), true);
   assertEquals(result.includes("/random"), true);

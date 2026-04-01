@@ -5,15 +5,16 @@
  * Scripture from your Discord client to your heart ❤️
  */
 
-import { Client, GatewayIntentBits } from "npm:discord.js";
+import { Client, GatewayIntentBits, REST, Routes } from "npm:discord.js";
 import { BibleService } from "./services/bible.ts";
 import { DailyVerseScheduler } from "./services/scheduler.ts";
-import { createCommandHandlers } from "./commands/commands.ts";
+import { createCommandHandlers, createCommandDefinitions } from "./commands/commands.ts";
 
 const CITATOR_DISCORD_TOKEN = Deno.env.get("CITATOR_DISCORD_TOKEN");
 const CITATOR_CLIENT_ID = Deno.env.get("CITATOR_CLIENT_ID");
+const CITATOR_GUILD_ID = Deno.env.get("CITATOR_GUILD_ID");
 const DAILY_VERSE_SCHEDULE = Deno.env.get("DAILY_VERSE_SCHEDULE") || "0 8 * * *";
-const DEFAULT_VERSION = Deno.env.get("DEFAULT_VERSION") || "ESV";
+const DEFAULT_VERSION = Deno.env.get("DEFAULT_VERSION") || "KJV";
 const TIMEZONE = Deno.env.get("TIMEZONE") || "America/New_York";
 
 if (!CITATOR_DISCORD_TOKEN) {
@@ -47,6 +48,29 @@ if (!clientId) {
 // Initialize services
 const bibleService = new BibleService(DEFAULT_VERSION);
 const commandHandlers = createCommandHandlers(bibleService);
+
+// Deploy slash commands on startup
+console.log("📝 Registering slash commands...");
+const rest = new REST({ version: "10" }).setToken(CITATOR_DISCORD_TOKEN);
+const commands = createCommandDefinitions();
+
+try {
+  if (CITATOR_GUILD_ID) {
+    await rest.put(
+      Routes.applicationGuildCommands(clientId, CITATOR_GUILD_ID),
+      { body: commands }
+    );
+    console.log(`✅ Registered guild commands for server ${CITATOR_GUILD_ID}`);
+  } else {
+    await rest.put(
+      Routes.applicationCommands(clientId),
+      { body: commands }
+    );
+    console.log(`✅ Registered global commands (may take up to 1 hour to appear)`);
+  }
+} catch (error) {
+  console.error("❌ Failed to register commands:", error);
+}
 
 // Create Discord client with WebSocket support
 const client = new Client({
@@ -93,9 +117,8 @@ client.on("ready", () => {
   console.log(`✅ Logged in as ${client.user?.username}#${client.user?.discriminator}`);
   console.log(`   ID: ${client.user?.id}`);
   console.log(`   Servers: ${client.guilds.cache.size}`);
-  console.log("\n📝 Remember to run: deno task deploy");
-  console.log("   to register slash commands with Discord.\n");
-  
+  console.log("\n✨ Bot is ready! Try using /verse, /daily, /random, or /help");
+
   // Start daily verse scheduler
   scheduler.start();
 });

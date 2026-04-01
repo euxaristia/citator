@@ -54,7 +54,7 @@ export CITATOR_DISCORD_TOKEN=your_bot_token_here
 export CITATOR_CLIENT_ID=your_client_id_here        # Auto-fetched if not provided
 export CITATOR_GUILD_ID=your_guild_id_here          # For faster command testing
 export DAILY_VERSE_SCHEDULE="0 8 * * *"             # 8:00 AM daily
-export DEFAULT_VERSION=ESV
+export DEFAULT_VERSION=KJV
 export TIMEZONE=America/New_York
 ```
 
@@ -63,25 +63,15 @@ Or run with inline variables:
 CITATOR_DISCORD_TOKEN=xxx CITATOR_CLIENT_ID=xxx deno task start
 ```
 
-### 4. Deploy Slash Commands
-
-```bash
-deno task deploy
-```
-
-This registers the slash commands with Discord. **Run this once** after setup and whenever you modify commands.
-
-### 5. Start the Bot
+### 4. Start the Bot
 
 ```bash
 deno task start
 ```
 
-Or for development with auto-reload:
+Slash commands are automatically registered on startup.
 
-```bash
-deno task dev
-```
+**Tip:** For instant command registration during development, set `CITATOR_GUILD_ID` to your test server ID. Without it, global commands can take up to 1 hour to appear.
 
 ## 📝 Commands
 
@@ -116,15 +106,12 @@ Supported formats:
 
 ### Bible Versions
 
-- **ESV** - English Standard Version
 - **KJV** - King James Version
-- **NIV** - New International Version
-- **NASB** - New American Standard Bible
 - **WEB** - World English Bible
+- **BBE** - Bible in Basic English
 - **DRB** - Douay-Rheims Bible
 - **WMB** - World Messianic Bible
 - **WMBBE** - World Messianic Bible (British Edition)
-- **BBE** - Bible in Basic English
 
 ## 🛠 Development
 
@@ -149,9 +136,8 @@ deno-biblebot/
 ### Available Tasks
 
 ```bash
-deno task start    # Start the bot
+deno task start    # Start the bot (auto-deploys commands)
 deno task dev      # Start with auto-reload
-deno task deploy   # Deploy slash commands
 deno task test     # Run test suite
 ```
 
@@ -159,7 +145,7 @@ deno task test     # Run test suite
 
 1. Add command definition in `src/commands/commands.ts` → `createCommandDefinitions()`
 2. Add command handler in `src/commands/commands.ts` → `createCommandHandlers()`
-3. Run `deno task deploy` to register
+3. Restart the bot - commands auto-deploy on startup
 
 ## 📡 API
 
