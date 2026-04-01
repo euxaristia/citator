@@ -116,10 +116,13 @@ export class BibleService {
 
     const url = `${BIBLE_API_BASE}/${encodeURIComponent(reference)}?translation=${encodeURIComponent(v)}`;
 
+    console.log(`[BibleAPI] Fetching: ${url}`);
+
     const response = await fetch(url);
 
     if (!response.ok) {
       await response.body?.cancel();
+      console.error(`[BibleAPI] HTTP error: ${response.status} ${response.statusText}`);
       if (response.status === 404) {
         throw new Error(`Verse not found: ${reference} (${v})`);
       }
@@ -127,8 +130,10 @@ export class BibleService {
     }
 
     const data: any = await response.json();
+    console.log(`[BibleAPI] Response:`, JSON.stringify(data).slice(0, 200));
 
     if (data.error) {
+      console.error(`[BibleAPI] API error:`, data.error);
       throw new Error(data.error);
     }
 
@@ -168,6 +173,8 @@ export class BibleService {
 
     const url = `${BOLLS_API_BASE}/get-chapter/${v}/${bookId}/${chapter}/`;
 
+    console.log(`[BollsAPI] Fetching: ${url}`);
+
     const response = await fetch(url, {
       method: "GET",
       credentials: "omit",
@@ -175,6 +182,7 @@ export class BibleService {
 
     if (!response.ok) {
       await response.body?.cancel();
+      console.error(`[BollsAPI] HTTP error: ${response.status} ${response.statusText}`);
       if (response.status === 404) {
         throw new Error(`Chapter not found: ${book} ${chapter} (${v})`);
       }
@@ -182,6 +190,7 @@ export class BibleService {
     }
 
     const data: any[] = await response.json();
+    console.log(`[BollsAPI] Response: ${data.length} verses`);
 
     // bolls.life returns a flat array of verses
     const filteredVerses = data.filter(
@@ -189,6 +198,7 @@ export class BibleService {
     );
 
     if (filteredVerses.length === 0) {
+      console.error(`[BollsAPI] No verses found for ${book} ${chapter}:${verseStart}${verseEnd ? `-${verseEnd}` : ""}`);
       throw new Error(`No verses found for ${book} ${chapter}:${verseStart}${verseEnd ? `-${verseEnd}` : ""}`);
     }
 

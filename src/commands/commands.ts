@@ -92,12 +92,13 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
       description: "Get a specific Bible verse or passage",
       execute: async (args: { reference: string; version?: string }) => {
         const parsed = bibleService.parseReference(args.reference);
-        
+
         if (!parsed) {
           return "❌ Invalid Bible reference. Please use format: `Book Chapter:Verse` (e.g., `John 3:16` or `Psalm 23:1-6`)";
         }
 
         try {
+          console.log(`[Command] /verse ${args.reference} ${args.version || 'KJV'}`);
           const verses = await bibleService.getVerses(
             parsed.book,
             parsed.chapter,
@@ -111,9 +112,11 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
           }
 
           const formatted = bibleService.formatVerses(verses);
-          return `📖 ${formatted}`;
+          return formatted;
         } catch (error) {
-          return `❌ Error: ${error instanceof Error ? error.message : "Unknown error occurred"}`;
+          const errorMsg = error instanceof Error ? error.message : "Unknown error occurred";
+          console.error(`[Command] /verse error:`, errorMsg);
+          return `❌ Error: ${errorMsg}`;
         }
       },
     },
