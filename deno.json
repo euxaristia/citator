@@ -9,10 +9,7 @@
     "test": "deno test --allow-net --allow-read --allow-env tests/"
   },
   "imports": {
-    "@discordjs/core": "npm:@discordjs/core@^1.2.0",
-    "@discordjs/rest": "npm:@discordjs/rest@^2.3.0",
-    "@discordjs/ws": "npm:@discordjs/ws@^1.5.0",
-    "discord-api-types": "npm:discord-api-types@^0.37.83"
+    "discord.js": "npm:discord.js@^14.14.0"
   },
   "compilerOptions": {
     "strict": true,

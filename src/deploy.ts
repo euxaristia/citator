@@ -3,8 +3,7 @@
  * Register the bot's slash commands with Discord
  */
 
-import { REST } from "@discordjs/rest";
-import { Routes } from "discord-api-types/v10";
+import { REST, Routes } from "npm:discord.js";
 import { createCommandDefinitions } from "./commands/commands.ts";
 
 const CITATOR_DISCORD_TOKEN = Deno.env.get("CITATOR_DISCORD_TOKEN");

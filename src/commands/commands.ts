@@ -2,10 +2,7 @@
  * Discord Slash Commands
  */
 
-import {
-  APIApplicationCommandOptionChoice,
-  RESTPostAPIChatInputApplicationCommandsJSONBody,
-} from "discord-api-types/v10";
+import { APIApplicationCommandOptionChoice, ChatInputCommandInteraction } from "discord.js";
 import { BibleService, BibleVerse } from "../services/bible.ts";
 
 export interface CommandHandler {
@@ -17,7 +14,7 @@ export interface CommandHandler {
 /**
  * Create slash command definitions for Discord
  */
-export function createCommandDefinitions(): RESTPostAPIChatInputApplicationCommandsJSONBody[] {
+export function createCommandDefinitions(): any[] {
   const versions: APIApplicationCommandOptionChoice<string>[] = [
     { name: "ESV (English Standard Version)", value: "ESV" },
     { name: "KJV (King James Version)", value: "KJV" },
