@@ -5,7 +5,8 @@
   "tasks": {
     "start": "deno run --allow-net --allow-read --allow-env --allow-write src/main.ts",
     "dev": "deno run --watch --allow-net --allow-read --allow-env --allow-write src/main.ts",
-    "deploy": "deno run --allow-net --allow-read --allow-env src/deploy.ts"
+    "deploy": "deno run --allow-net --allow-read --allow-env src/deploy.ts",
+    "test": "deno test --allow-net --allow-read --allow-env tests/"
   },
   "imports": {
     "@discordjs/core": "npm:@discordjs/core@^1.2.0",
@@ -14,7 +15,7 @@
   },
   "compilerOptions": {
     "strict": true,
-    "lib": ["deno.ns", "dom.iterable"]
+    "lib": ["deno.ns", "dom"]
   },
   "lint": {
     "rules": {

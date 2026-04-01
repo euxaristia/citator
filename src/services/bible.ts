@@ -46,25 +46,29 @@ export class BibleService {
     const response = await fetch(url);
     
     if (!response.ok) {
+      // Consume response body to avoid resource leak
+      await response.body?.cancel();
       if (response.status === 404) {
         throw new Error(`Verse not found: ${reference} (${v})`);
       }
       throw new Error(`Bible API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
     
     if (data.error) {
       throw new Error(data.error);
     }
 
-    return data.verses.map((v: any) => ({
-      book: v.book,
-      chapter: v.chapter,
-      verse: v.verse,
-      text: v.text,
-      version: v.translation_id,
-      reference: `${v.book} ${v.chapter}:${v.verse}`
+    const apiVersion = data.translation_id?.toUpperCase() || v;
+
+    return data.verses.map((verse: any) => ({
+      book: verse.book_name,
+      chapter: verse.chapter,
+      verse: verse.verse,
+      text: verse.text.trim(),
+      version: apiVersion,
+      reference: `${verse.book_name} ${verse.chapter}:${verse.verse}`
     }));
   }
 
@@ -158,16 +162,11 @@ export class BibleService {
 
   /**
    * Get available Bible versions
+   * Note: bible-api.com doesn't have a /translations endpoint, so we return known versions
    */
   async getVersions(): Promise<string[]> {
-    const response = await fetch(`${BIBLE_API_BASE}/translations`);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch versions: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.map((t: any) => t.abbreviation);
+    // Return known versions since the API doesn't provide an endpoint
+    return ["KJV", "ESV", "WEB", "BBE", "DRB", "WMB", "WMBBE"];
   }
 
   /**
@@ -223,8 +222,8 @@ export class BibleService {
   } | null {
     // Handle various reference formats
     const patterns = [
-      /^([A-Za-z]+\s?[A-Za-z]?)\s+(\d+):(\d+)(?:-(\d+))?$/,  // John 3:16 or John 3:16-18
-      /^([A-Za-z]+\s?[A-Za-z]?)\s+(\d+)\s+(\d+)(?:-(\d+))?$/, // John 3 16 (alternative format)
+      /^([123]?\s?[A-Za-z]+(?:\s+of\s+[A-Za-z]+)?)\s+(\d+):(\d+)(?:-(\d+))?$/,  // 1 John 3:16, Song of Solomon 2:10, John 3:16
+      /^([123]?\s?[A-Za-z]+)\s+(\d+)\s+(\d+)(?:-(\d+))?$/,  // John 3 16 (alternative format)
     ];
 
     for (const pattern of patterns) {
