@@ -1,0 +1,30 @@
+{
+  "name": "citator",
+  "version": "1.0.0",
+  "description": "A Discord Bible bot built with Deno - delivers scripture directly from Discord",
+  "tasks": {
+    "start": "deno run --allow-net --allow-read --allow-env --allow-write src/main.ts",
+    "dev": "deno run --watch --allow-net --allow-read --allow-env --allow-write src/main.ts",
+    "deploy": "deno run --allow-net --allow-read --allow-env src/deploy.ts"
+  },
+  "imports": {
+    "@discordjs/core": "npm:@discordjs/core@^1.2.0",
+    "@discordjs/rest": "npm:@discordjs/rest@^2.3.0",
+    "discord-api-types": "npm:discord-api-types@^0.37.83",
+    "std/dotenv": "jsr:@std/dotenv@^0.225.2",
+    "std/encoding": "jsr:@std/encoding@^1.0.5"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "lib": ["deno.ns", "dom.iterable"]
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "fmt": {
+    "indentWidth": 2,
+    "lineWidth": 100
+  }
+}
