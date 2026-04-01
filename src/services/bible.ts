@@ -143,7 +143,7 @@ export class BibleService {
       book: verse.book_name,
       chapter: verse.chapter,
       verse: verse.verse,
-      text: verse.text.trim(),
+      text: this.cleanText(verse.text),
       version: apiVersion,
       reference: `${verse.book_name} ${verse.chapter}:${verse.verse}`
     }));
@@ -216,12 +216,13 @@ export class BibleService {
   }
 
   /**
-   * Clean HTML tags from verse text (for bolls.life)
+   * Clean HTML tags and normalize whitespace from verse text
    */
   private cleanText(text: string): string {
     return text
-      .replace(/<[^>]*>/g, "")
-      .replace(/\s+/g, " ")
+      .replace(/<[^>]*>/g, "")  // Remove HTML tags
+      .replace(/[\n\r]+/g, " ")  // Replace newlines with spaces
+      .replace(/\s+/g, " ")      // Normalize multiple spaces to single
       .trim();
   }
 
