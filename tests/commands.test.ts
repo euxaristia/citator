@@ -148,9 +148,15 @@ Deno.test("CommandHandler - versions - returns list", async () => {
   
   const result = await versionsHandler.execute({});
   
+  // bible-api.com versions
   assertEquals(result.includes("KJV"), true);
   assertEquals(result.includes("WEB"), true);
   assertEquals(result.includes("BBE"), true);
+  // bolls.life versions
+  assertEquals(result.includes("VULG"), true);
+  assertEquals(result.includes("WLC"), true);
+  assertEquals(result.includes("LXX"), true);
+  assertEquals(result.includes("SBLGNT"), true);
 });
 
 Deno.test("CommandHandler - help - returns help text", async () => {

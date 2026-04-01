@@ -1,9 +1,51 @@
 /**
  * Bible API Service
- * Interfaces with bible-api.com to fetch scripture
+ * Supports both bible-api.com and bolls.life APIs
  */
 
 const BIBLE_API_BASE = "https://bible-api.com";
+const BOLLS_API_BASE = "https://bolls.life";
+
+// Book name to 3-letter code mapping for bolls.life
+const bookToCode: Record<string, string> = {
+  "genesis": "GEN", "exodus": "EXO", "leviticus": "LEV", "numbers": "NUM",
+  "deuteronomy": "DEU", "joshua": "JOS", "judges": "JDG", "ruth": "RUT",
+  "1 samuel": "1SA", "2 samuel": "2SA", "1 kings": "1KI", "2 kings": "2KI",
+  "1 chronicles": "1CH", "2 chronicles": "2CH", "ezra": "EZR", "nehemiah": "NEH",
+  "esther": "EST", "job": "JOB", "psalms": "PSA", "proverbs": "PRO",
+  "ecclesiastes": "ECC", "song of solomon": "SOL", "isaiah": "ISA",
+  "jeremiah": "JER", "lamentations": "LAM", "ezekiel": "EZK", "daniel": "DAN",
+  "hosea": "HOS", "joel": "JOL", "amos": "AMO", "obadiah": "OBA",
+  "jonah": "JON", "micah": "MIC", "nahum": "NAM", "habakkuk": "HAB",
+  "zephaniah": "ZEP", "haggai": "HAG", "zechariah": "ZEC", "malachi": "MAL",
+  "matthew": "MAT", "mark": "MRK", "luke": "LUK", "john": "JHN",
+  "acts": "ACT", "romans": "ROM", "1 corinthians": "1CO", "2 corinthians": "2CO",
+  "galatians": "GAL", "ephesians": "EPH", "philippians": "PHP", "colossians": "COL",
+  "1 thessalonians": "1TH", "2 thessalonians": "2TH", "1 timothy": "1TI",
+  "2 timothy": "2TI", "titus": "TIT", "philemon": "PHM", "hebrews": "HEB",
+  "james": "JAS", "1 peter": "1PE", "2 peter": "2PE", "1 john": "1JN",
+  "2 john": "2JN", "3 john": "3JN", "jude": "JUD", "revelation": "REV",
+};
+
+// 3-letter code to book ID mapping for bolls.life
+const codeToId: Record<string, number> = {
+  "GEN": 1, "EXO": 2, "LEV": 3, "NUM": 4, "DEU": 5, "JOS": 6, "JDG": 7,
+  "RUT": 8, "1SA": 9, "2SA": 10, "1KI": 11, "2KI": 12, "1CH": 13, "2CH": 14,
+  "EZR": 15, "NEH": 16, "EST": 17, "JOB": 18, "PSA": 19, "PRO": 20, "ECC": 21,
+  "SOL": 22, "ISA": 23, "JER": 24, "LAM": 25, "EZK": 26, "DAN": 27, "HOS": 28,
+  "JOL": 29, "AMO": 30, "OBA": 31, "JON": 32, "MIC": 33, "NAM": 34, "HAB": 35,
+  "ZEP": 36, "HAG": 37, "ZEC": 38, "MAL": 39, "MAT": 40, "MRK": 41, "LUK": 42,
+  "JHN": 43, "ACT": 44, "ROM": 45, "1CO": 46, "2CO": 47, "GAL": 48, "EPH": 49,
+  "PHP": 50, "COL": 51, "1TH": 52, "2TH": 53, "1TI": 54, "2TI": 55, "TIT": 56,
+  "PHM": 57, "HEB": 58, "JAS": 59, "1PE": 60, "2PE": 61, "1JN": 62, "2JN": 63,
+  "3JN": 64, "JUD": 65, "REV": 66,
+};
+
+// bolls.life ONLY versions (not in bible-api.com)
+const BOLLS_ONLY_VERSIONS = ["VULG", "WLC", "LXX", "SBLGNT", "BYZ", "MT", "TR"];
+
+// bible-api.com versions
+const BIBLE_API_VERSIONS = ["KJV", "WEB", "BBE", "DRB", "WMB", "WMBBE"];
 
 export interface BibleVerse {
   book: string;
@@ -23,8 +65,20 @@ export interface BibleBook {
 export class BibleService {
   private defaultVersion: string;
 
-  constructor(defaultVersion: string = "ESV") {
+  constructor(defaultVersion: string = "KJV") {
     this.defaultVersion = defaultVersion;
+  }
+
+  /**
+   * Determine which API to use based on version
+   * bolls.life ONLY for original languages and Latin
+   * bible-api.com for English translations
+   */
+  private getApiForVersion(version: string): "bible-api" | "bolls" {
+    if (BOLLS_ONLY_VERSIONS.includes(version)) {
+      return "bolls";
+    }
+    return "bible-api";
   }
 
   /**
@@ -38,15 +92,33 @@ export class BibleService {
     version?: string
   ): Promise<BibleVerse[]> {
     const v = version || this.defaultVersion;
+    const api = this.getApiForVersion(v);
+
+    if (api === "bolls") {
+      return this.getVersesFromBolls(book, chapter, verseStart, verseEnd, v);
+    }
+    return this.getVersesFromBibleApi(book, chapter, verseStart, verseEnd, v);
+  }
+
+  /**
+   * Fetch from bible-api.com
+   */
+  private async getVersesFromBibleApi(
+    book: string,
+    chapter: number,
+    verseStart: number,
+    verseEnd?: number,
+    version?: string
+  ): Promise<BibleVerse[]> {
+    const v = version || this.defaultVersion;
     const verseRange = verseEnd ? `${verseStart}-${verseEnd}` : `${verseStart}`;
     const reference = `${book} ${chapter}:${verseRange}`;
-    
+
     const url = `${BIBLE_API_BASE}/${encodeURIComponent(reference)}?translation=${encodeURIComponent(v)}`;
-    
+
     const response = await fetch(url);
-    
+
     if (!response.ok) {
-      // Consume response body to avoid resource leak
       await response.body?.cancel();
       if (response.status === 404) {
         throw new Error(`Verse not found: ${reference} (${v})`);
@@ -55,7 +127,7 @@ export class BibleService {
     }
 
     const data: any = await response.json();
-    
+
     if (data.error) {
       throw new Error(data.error);
     }
@@ -73,100 +145,141 @@ export class BibleService {
   }
 
   /**
-   * Get verse of the day (using a simple algorithm based on date)
+   * Fetch from bolls.life
+   */
+  private async getVersesFromBolls(
+    book: string,
+    chapter: number,
+    verseStart: number,
+    verseEnd?: number,
+    version?: string
+  ): Promise<BibleVerse[]> {
+    const v = version || this.defaultVersion;
+    const bookCode = bookToCode[book.toLowerCase()];
+
+    if (!bookCode) {
+      throw new Error(`Unknown book: ${book}`);
+    }
+
+    const bookId = codeToId[bookCode];
+    if (!bookId) {
+      throw new Error(`Unknown book code: ${bookCode}`);
+    }
+
+    const url = `${BOLLS_API_BASE}/get-chapter/${v}/${bookId}/${chapter}/`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      credentials: "omit",
+    });
+
+    if (!response.ok) {
+      await response.body?.cancel();
+      if (response.status === 404) {
+        throw new Error(`Chapter not found: ${book} ${chapter} (${v})`);
+      }
+      throw new Error(`Bolls API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data: any[] = await response.json();
+
+    // bolls.life returns a flat array of verses
+    const filteredVerses = data.filter(
+      (verse: any) => verse.verse >= verseStart && (verseEnd === undefined || verse.verse <= verseEnd)
+    );
+
+    if (filteredVerses.length === 0) {
+      throw new Error(`No verses found for ${book} ${chapter}:${verseStart}${verseEnd ? `-${verseEnd}` : ""}`);
+    }
+
+    // Get book name from first verse
+    const bookName = filteredVerses[0].book_name || book;
+
+    return filteredVerses.map((verse: any) => ({
+      book: bookName,
+      chapter: chapter,
+      verse: verse.verse,
+      text: this.cleanText(verse.text),
+      version: v,
+      reference: `${bookName} ${chapter}:${verse.verse}`
+    }));
+  }
+
+  /**
+   * Clean HTML tags from verse text (for bolls.life)
+   */
+  private cleanText(text: string): string {
+    return text
+      .replace(/<[^>]*>/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  /**
+   * Get verse of the day
    */
   async getVerseOfTheDay(): Promise<BibleVerse> {
     const today = new Date();
     const dayOfYear = this.getDayOfYear(today);
-    
-    // Use a predefined list of encouraging verses
+
     const verses = [
-      "John 3:16",
-      "Psalm 23:1",
-      "Philippians 4:13",
-      "Jeremiah 29:11",
-      "Isaiah 40:31",
-      "Psalm 46:1",
-      "Matthew 11:28",
-      "Romans 8:28",
-      "Joshua 1:9",
-      "Psalm 119:105",
-      "1 Corinthians 16:14",
-      "Proverbs 3:5-6",
-      "Galatians 5:22-23",
-      "Ephesians 2:8-9",
-      "Psalm 34:8",
-      "2 Corinthians 5:17",
-      "1 Peter 5:7",
-      "Hebrews 11:1",
-      "James 1:5",
-      "1 John 4:19",
-      "Psalm 19:14",
-      "Colossians 3:23",
-      "1 Thessalonians 5:16-18",
-      "Titus 3:5",
-      "1 John 1:9",
-      "Psalm 27:1",
-      "Isaiah 41:10",
-      "Matthew 6:33",
-      "Luke 1:37",
-      "Romans 12:2"
+      { book: "john", chapter: 3, verse: 16 },
+      { book: "psalms", chapter: 23, verse: 1 },
+      { book: "philippians", chapter: 4, verse: 13 },
+      { book: "jeremiah", chapter: 29, verse: 11 },
+      { book: "isaiah", chapter: 40, verse: 31 },
+      { book: "psalms", chapter: 46, verse: 1 },
+      { book: "matthew", chapter: 11, verse: 28 },
+      { book: "romans", chapter: 8, verse: 28 },
+      { book: "joshua", chapter: 1, verse: 9 },
+      { book: "psalms", chapter: 119, verse: 105 },
+      { book: "1 corinthians", chapter: 16, verse: 14 },
+      { book: "proverbs", chapter: 3, verse: 5 },
+      { book: "galatians", chapter: 5, verse: 22 },
+      { book: "ephesians", chapter: 2, verse: 8 },
+      { book: "psalms", chapter: 34, verse: 8 },
+      { book: "2 corinthians", chapter: 5, verse: 17 },
+      { book: "1 peter", chapter: 5, verse: 7 },
+      { book: "hebrews", chapter: 11, verse: 1 },
+      { book: "james", chapter: 1, verse: 5 },
+      { book: "1 john", chapter: 4, verse: 19 },
+      { book: "psalms", chapter: 19, verse: 14 },
+      { book: "colossians", chapter: 3, verse: 23 },
+      { book: "1 thessalonians", chapter: 5, verse: 16 },
+      { book: "titus", chapter: 3, verse: 5 },
+      { book: "1 john", chapter: 1, verse: 9 },
+      { book: "psalms", chapter: 27, verse: 1 },
+      { book: "isaiah", chapter: 41, verse: 10 },
+      { book: "matthew", chapter: 6, verse: 33 },
+      { book: "luke", chapter: 1, verse: 37 },
+      { book: "romans", chapter: 12, verse: 2 },
     ];
 
-    // Select verse based on day of year (rotates through the list)
     const selectedVerse = verses[dayOfYear % verses.length];
-    
-    // Parse the reference
-    const match = selectedVerse.match(/^(.+?)\s+(\d+):(\d+)(?:-(\d+))?$/);
-    if (!match) {
-      throw new Error("Invalid verse reference");
-    }
 
-    const [, book, chapter, verseStart, verseEnd] = match;
     const verses_result = await this.getVerses(
-      book,
-      parseInt(chapter),
-      parseInt(verseStart),
-      verseEnd ? parseInt(verseEnd) : undefined
+      selectedVerse.book,
+      selectedVerse.chapter,
+      selectedVerse.verse
     );
 
     return verses_result[0];
   }
 
   /**
-   * Search for verses containing specific text
-   * Note: bible-api.com doesn't support text search, so this is a placeholder
-   * for future integration with a search-capable API
+   * Search for verses (not supported by either API)
    */
   async search(text: string, version?: string): Promise<BibleVerse[]> {
-    // For now, return a message that search is not available
     throw new Error(
-      "Text search is not available with the current Bible API. " +
-      "Please use specific verse references instead."
+      "Text search is not available. Please use specific verse references instead."
     );
   }
 
   /**
-   * Get list of all Bible books
-   */
-  async getBooks(): Promise<BibleBook[]> {
-    const response = await fetch(`${BIBLE_API_BASE}/books`);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch books: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  }
-
-  /**
-   * Get available Bible versions
-   * Note: bible-api.com doesn't have a /translations endpoint, so we return known versions
+   * Get all available Bible versions from both APIs
    */
   async getVersions(): Promise<string[]> {
-    // Return known versions supported by bible-api.com
-    return ["KJV", "WEB", "BBE", "DRB", "WMB", "WMBBE"];
+    return [...BIBLE_API_VERSIONS, ...BOLLS_ONLY_VERSIONS].filter((v, i, a) => a.indexOf(v) === i);
   }
 
   /**
@@ -174,12 +287,12 @@ export class BibleService {
    */
   formatVerses(verses: BibleVerse[]): string {
     if (verses.length === 0) return "";
-    
+
     const version = verses[0].version;
     const text = verses.map(v => v.text).join(" ");
     const reference = this.formatReference(verses);
-    
-    return `${text}\n\n*${reference} (${version})*`;
+
+    return `📖 ${text}\n\n*${reference} (${version})*`;
   }
 
   /**
@@ -193,11 +306,11 @@ export class BibleService {
 
     const first = verses[0];
     const last = verses[verses.length - 1];
-    
+
     if (first.book === last.book && first.chapter === last.chapter) {
       return `${first.book} ${first.chapter}:${first.verse}-${last.verse}`;
     }
-    
+
     return `${first.book} ${first.chapter}:${first.verse} - ${last.book} ${last.chapter}:${last.verse}`;
   }
 
@@ -212,7 +325,7 @@ export class BibleService {
   }
 
   /**
-   * Parse a verse reference string (e.g., "John 3:16" or "John 3:16-18")
+   * Parse a verse reference string
    */
   parseReference(ref: string): {
     book: string;
@@ -220,10 +333,9 @@ export class BibleService {
     verseStart: number;
     verseEnd?: number;
   } | null {
-    // Handle various reference formats
     const patterns = [
-      /^([123]?\s?[A-Za-z]+(?:\s+of\s+[A-Za-z]+)?)\s+(\d+):(\d+)(?:-(\d+))?$/,  // 1 John 3:16, Song of Solomon 2:10, John 3:16
-      /^([123]?\s?[A-Za-z]+)\s+(\d+)\s+(\d+)(?:-(\d+))?$/,  // John 3 16 (alternative format)
+      /^([123]?\s?[A-Za-z]+(?:\s+of\s+[A-Za-z]+)?)\s+(\d+):(\d+)(?:-(\d+))?$/,
+      /^([123]?\s?[A-Za-z]+)\s+(\d+)\s+(\d+)(?:-(\d+))?$/,
     ];
 
     for (const pattern of patterns) {

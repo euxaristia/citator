@@ -134,12 +134,22 @@ Supported formats:
 
 ### Bible Versions
 
+**Modern English (bible-api.com):**
 - **KJV** - King James Version
 - **WEB** - World English Bible
 - **BBE** - Bible in Basic English
 - **DRB** - Douay-Rheims Bible
 - **WMB** - World Messianic Bible
 - **WMBBE** - World Messianic Bible (British Edition)
+
+**Original Languages & Latin (bolls.life):**
+- **VULG** - Latin Vulgate
+- **WLC** - Hebrew (Westminster Leningrad Codex)
+- **LXX** - Greek Septuagint (Old Testament)
+- **SBLGNT** - Greek New Testament
+- **BYZ** - Byzantine Textform (Greek NT)
+- **MT** - Masoretic Text (Hebrew)
+- **TR** - Textus Receptus (Greek NT)
 
 ## 🛠 Development
 

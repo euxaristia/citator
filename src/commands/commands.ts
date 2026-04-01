@@ -16,12 +16,19 @@ export interface CommandHandler {
  */
 export function createCommandDefinitions(): any[] {
   const versions: APIApplicationCommandOptionChoice<string>[] = [
-    { name: "KJV (King James Version)", value: "KJV" },
-    { name: "WEB (World English Bible)", value: "WEB" },
-    { name: "BBE (Bible in Basic English)", value: "BBE" },
-    { name: "DRB (Douay-Rheims Bible)", value: "DRB" },
-    { name: "WMB (World Messianic Bible)", value: "WMB" },
-    { name: "WMBBE (WMB British Edition)", value: "WMBBE" },
+    { name: "📖 KJV (King James Version)", value: "KJV" },
+    { name: "📖 WEB (World English Bible)", value: "WEB" },
+    { name: "📖 BBE (Bible in Basic English)", value: "BBE" },
+    { name: "📖 DRB (Douay-Rheims Bible)", value: "DRB" },
+    { name: "📖 WMB (World Messianic Bible)", value: "WMB" },
+    { name: "📖 WMBBE (WMB British Edition)", value: "WMBBE" },
+    { name: "📜 VULG (Latin Vulgate)", value: "VULG" },
+    { name: "📜 WLC (Hebrew - Westminster Leningrad)", value: "WLC" },
+    { name: "📜 LXX (Greek Septuagint)", value: "LXX" },
+    { name: "📜 SBLGNT (Greek NT)", value: "SBLGNT" },
+    { name: "📜 BYZ (Byzantine Textform)", value: "BYZ" },
+    { name: "📜 MT (Masoretic Text)", value: "MT" },
+    { name: "📜 TR (Textus Receptus)", value: "TR" },
   ];
 
   return [
@@ -234,12 +241,22 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
       execute: async () => {
         const versions = [
           "**📚 Available Bible Versions:**\n",
-          "• **KJV** - King James Version",
-          "• **WEB** - World English Bible",
-          "• **BBE** - Bible in Basic English",
-          "• **DRB** - Douay-Rheims Bible",
-          "• **WMB** - World Messianic Bible",
-          "• **WMBBE** - World Messianic Bible (British Edition)",
+          "**Modern English (bible-api.com):**",
+          "• KJV - King James Version",
+          "• WEB - World English Bible",
+          "• BBE - Bible in Basic English",
+          "• DRB - Douay-Rheims Bible",
+          "• WMB - World Messianic Bible",
+          "• WMBBE - WMB British Edition",
+          "",
+          "**Original Languages & Latin (bolls.life):**",
+          "• VULG - Latin Vulgate",
+          "• WLC - Hebrew (Westminster Leningrad Codex)",
+          "• LXX - Greek Septuagint (Old Testament)",
+          "• SBLGNT - Greek New Testament",
+          "• BYZ - Byzantine Textform (Greek NT)",
+          "• MT - Masoretic Text (Hebrew)",
+          "• TR - Textus Receptus (Greek NT)",
           "\n*Use `/verse` with the version parameter to specify a translation.*",
         ].join("\n");
 
@@ -257,6 +274,8 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
           "• `/verse <reference> [version]` - Get a specific Bible verse",
           "  Example: `/verse John 3:16 KJV`",
           "  Example: `/verse Psalm 23:1-6 WEB`",
+          "  Example: `/verse John 1:1 SBLGNT` (Greek)",
+          "  Example: `/verse Psalm 23:1 WLC` (Hebrew)",
           "",
           "• `/daily` - Get the verse of the day",
           "",
@@ -266,7 +285,7 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
           "",
           "• `/help` - Show this help message",
           "",
-          "**Supported Versions:** KJV, WEB, BBE, DRB, WMB, WMBBE",
+          "**13 Versions Available:** KJV, WEB, BBE, DRB, WMB, WMBBE, VULG, WLC, LXX, SBLGNT, BYZ, MT, TR",
           "",
           "*Scripture from your Discord client to your heart* ❤️",
         ].join("\n");

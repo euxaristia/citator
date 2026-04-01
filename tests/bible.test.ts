@@ -180,9 +180,39 @@ Deno.test("BibleService - getVersions - returns array", async () => {
   const versions = await service.getVersions();
   
   assertEquals(Array.isArray(versions), true);
+  // bible-api.com versions
   assertEquals(versions.includes("KJV"), true);
   assertEquals(versions.includes("WEB"), true);
   assertEquals(versions.includes("BBE"), true);
+  // bolls.life ONLY versions
+  assertEquals(versions.includes("VULG"), true);
+  assertEquals(versions.includes("WLC"), true);
+  assertEquals(versions.includes("LXX"), true);
+  assertEquals(versions.includes("SBLGNT"), true);
+  assertEquals(versions.includes("BYZ"), true);
+  assertEquals(versions.includes("MT"), true);
+  assertEquals(versions.includes("TR"), true);
+});
+
+Deno.test("BibleService - getVerses - from bolls.life (VULG)", async () => {
+  const service = new BibleService();
+  // Get Psalm 23:1 specifically
+  const verses = await service.getVerses("psalms", 23, 1, 1, "VULG");
+
+  assertEquals(verses.length, 1);
+  assertEquals(verses[0].version, "VULG");
+  assertEquals(verses[0].verse, 1);
+  assertEquals(typeof verses[0].text, "string");
+});
+
+Deno.test("BibleService - getVerses - from bolls.life (LXX)", async () => {
+  const service = new BibleService();
+  // Get Psalm 23:1 specifically
+  const verses = await service.getVerses("psalms", 23, 1, 1, "LXX");
+
+  assertEquals(verses.length, 1);
+  assertEquals(verses[0].version, "LXX");
+  assertEquals(verses[0].verse, 1);
 });
 
 Deno.test("BibleService - search - throws error", async () => {
