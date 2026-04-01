@@ -91,9 +91,12 @@ const MIN_ACCOUNT_AGE = 2 * 24 * 60 * 60 * 1000;
  */
 async function sendToChannel(channelId: string, message: string): Promise<void> {
   try {
-    await client.api.channels[channelId].messages.post({
-      body: { content: message },
-    });
+    const channel = client.channels.cache.get(channelId);
+    if (channel && channel.isTextBased()) {
+      await channel.send(message);
+    } else {
+      console.error(`Channel ${channelId} not found or is not a text-based channel`);
+    }
   } catch (error) {
     console.error(`Failed to send to channel ${channelId}:`, error);
     throw error;
@@ -113,7 +116,7 @@ console.log(`   Default Version: ${DEFAULT_VERSION}`);
 console.log(`   Daily Verse Schedule: ${DAILY_VERSE_SCHEDULE} (${TIMEZONE})`);
 
 // Event: Client Ready
-client.on("clientReady", () => {
+client.on("ready", () => {
   console.log(`✅ Logged in as ${client.user?.username}#${client.user?.discriminator}`);
   console.log(`   ID: ${client.user?.id}`);
   console.log(`   Servers: ${client.guilds.cache.size}`);
