@@ -189,7 +189,7 @@ Deno.test("CommandHandler - help - returns embed", async () => {
   assertExists(result.embeds);
   assertEquals(result.embeds.length, 1);
   const embedJson = result.embeds[0].toJSON();
-  assertEquals(embedJson.title, "📖 Citator Help");
+  assertEquals(embedJson.title, "📖 PrimaScriptura Help");
   // Check fields contain command info
   const fields = embedJson.fields || [];
   const hasCommands = fields.some((f: any) => 

@@ -6,26 +6,26 @@
 import { REST, Routes } from "npm:discord.js";
 import { createCommandDefinitions } from "./commands/commands.ts";
 
-const CITATOR_DISCORD_TOKEN = Deno.env.get("CITATOR_DISCORD_TOKEN");
-const CITATOR_CLIENT_ID = Deno.env.get("CITATOR_CLIENT_ID");
-const CITATOR_GUILD_ID = Deno.env.get("CITATOR_GUILD_ID");
+const PRIMASCRIPTURA_DISCORD_TOKEN = Deno.env.get("PRIMASCRIPTURA_DISCORD_TOKEN");
+const PRIMASCRIPTURA_CLIENT_ID = Deno.env.get("PRIMASCRIPTURA_CLIENT_ID");
+const PRIMASCRIPTURA_GUILD_ID = Deno.env.get("PRIMASCRIPTURA_GUILD_ID");
 
-if (!CITATOR_DISCORD_TOKEN) {
-  console.error("❌ Missing required environment variable: CITATOR_DISCORD_TOKEN");
+if (!PRIMASCRIPTURA_DISCORD_TOKEN) {
+  console.error("❌ Missing required environment variable: PRIMASCRIPTURA_DISCORD_TOKEN");
   Deno.exit(1);
 }
 
 // Create REST client
-const rest = new REST({ version: "10" }).setToken(CITATOR_DISCORD_TOKEN);
+const rest = new REST({ version: "10" }).setToken(PRIMASCRIPTURA_DISCORD_TOKEN);
 
 // Get client ID from env or fetch from API
-let clientId = CITATOR_CLIENT_ID;
+let clientId = PRIMASCRIPTURA_CLIENT_ID;
 if (!clientId) {
-  console.log("⏳ No CITATOR_CLIENT_ID provided, fetching from Discord API...");
+  console.log("⏳ No PRIMASCRIPTURA_CLIENT_ID provided, fetching from Discord API...");
   try {
     const response = await fetch("https://discord.com/api/v10/users/@me", {
       headers: {
-        Authorization: `Bot ${CITATOR_DISCORD_TOKEN}`,
+        Authorization: `Bot ${PRIMASCRIPTURA_DISCORD_TOKEN}`,
       },
     });
     if (!response.ok) {
@@ -36,7 +36,7 @@ if (!clientId) {
     console.log(`✅ Found client ID: ${clientId}`);
   } catch (error) {
     console.error("❌ Failed to fetch client ID:", error);
-    console.error("   Please set CITATOR_CLIENT_ID environment variable");
+    console.error("   Please set PRIMASCRIPTURA_CLIENT_ID environment variable");
     Deno.exit(1);
   }
 }
@@ -47,16 +47,16 @@ const commands = createCommandDefinitions();
 try {
   console.log("📝 Started refreshing application (/) commands.");
 
-  if (CITATOR_GUILD_ID) {
+  if (PRIMASCRIPTURA_GUILD_ID) {
     // Guild-specific commands (faster for testing)
     const responseData = await rest.put(
-      Routes.applicationGuildCommands(clientId, CITATOR_GUILD_ID),
+      Routes.applicationGuildCommands(clientId, PRIMASCRIPTURA_GUILD_ID),
       { body: commands }
     );
     console.log(
       `✅ Successfully registered ${
         (responseData as any[]).length
-      } guild commands for guild ${CITATOR_GUILD_ID}`
+      } guild commands for guild ${PRIMASCRIPTURA_GUILD_ID}`
     );
   } else {
     // Global commands

@@ -1,4 +1,4 @@
-# 📖 Citator
+# 📖 PrimaScriptura
 
 A Discord Bible bot built with **Deno** - delivers scripture directly from your Discord client to your heart. An alternative to [BibleBot](https://github.com/BibleBot/BibleBot).
 
@@ -22,10 +22,10 @@ A Discord Bible bot built with **Deno** - delivers scripture directly from your 
 1. Push your code to GitHub
 2. Go to [Railway](https://railway.app/) and create a new project
 3. Select **Deploy from GitHub repo**
-4. Choose your `citator` repository
+4. Choose your `primascriptura` repository
 5. Add environment variables:
-   - `CITATOR_DISCORD_TOKEN` - Your bot token
-   - `CITATOR_GUILD_ID` (optional) - Your server ID for instant commands
+   - `PRIMASCRIPTURA_DISCORD_TOKEN` - Your bot token
+   - `PRIMASCRIPTURA_GUILD_ID` (optional) - Your server ID for instant commands
 6. Deploy!
 
 Railway will automatically detect the `Dockerfile` and deploy your bot.
@@ -37,9 +37,9 @@ Railway will automatically detect the `Dockerfile` and deploy your bot.
 curl -fsSL https://deno.land/install.sh | sh
 
 # Clone and run
-git clone https://github.com/euxaristia/citator.git
-cd citator
-export CITATOR_DISCORD_TOKEN=your_token_here
+git clone https://github.com/euxaristia/primascriptura.git
+cd primascriptura
+export PRIMASCRIPTURA_DISCORD_TOKEN=your_token_here
 deno task start
 ```
 
@@ -66,20 +66,20 @@ For production, use a process manager like `pm2` or create a `systemd` service.
 ### 2. Clone and Configure
 
 ```bash
-cd citator
+cd primascriptura
 ```
 
 ### 3. Set environment variables
 
 **Required:**
 ```bash
-export CITATOR_DISCORD_TOKEN=your_bot_token_here
+export PRIMASCRIPTURA_DISCORD_TOKEN=your_bot_token_here
 ```
 
 **Optional:**
 ```bash
-export CITATOR_CLIENT_ID=your_client_id_here        # Auto-fetched if not provided
-export CITATOR_GUILD_ID=your_guild_id_here          # For faster command testing
+export PRIMASCRIPTURA_CLIENT_ID=your_client_id_here        # Auto-fetched if not provided
+export PRIMASCRIPTURA_GUILD_ID=your_guild_id_here          # For faster command testing
 export DAILY_VERSE_SCHEDULE="0 8 * * *"             # 8:00 AM daily
 export DEFAULT_VERSION=KJV
 export TIMEZONE=America/New_York
@@ -87,7 +87,7 @@ export TIMEZONE=America/New_York
 
 Or run with inline variables:
 ```bash
-CITATOR_DISCORD_TOKEN=xxx CITATOR_CLIENT_ID=xxx deno task start
+PRIMASCRIPTURA_DISCORD_TOKEN=xxx PRIMASCRIPTURA_CLIENT_ID=xxx deno task start
 ```
 
 ### 4. Start the Bot
@@ -98,7 +98,7 @@ deno task start
 
 Slash commands are automatically registered on startup.
 
-**Tip:** For instant command registration during development, set `CITATOR_GUILD_ID` to your test server ID. Without it, global commands can take up to 1 hour to appear.
+**Tip:** For instant command registration during development, set `PRIMASCRIPTURA_GUILD_ID` to your test server ID. Without it, global commands can take up to 1 hour to appear.
 
 ## 📝 Commands
 
@@ -124,9 +124,9 @@ Supported formats:
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `CITATOR_DISCORD_TOKEN` | ✅ | - | Your Discord bot token |
-| `CITATOR_CLIENT_ID` | ❌ | Auto-fetched | Your application's client ID |
-| `CITATOR_GUILD_ID` | ❌ | - | Guild ID for testing (commands appear instantly) |
+| `PRIMASCRIPTURA_DISCORD_TOKEN` | ✅ | - | Your Discord bot token |
+| `PRIMASCRIPTURA_CLIENT_ID` | ❌ | Auto-fetched | Your application's client ID |
+| `PRIMASCRIPTURA_GUILD_ID` | ❌ | - | Guild ID for testing (commands appear instantly) |
 | `DAILY_VERSE_SCHEDULE` | ❌ | `0 8 * * *` | Cron-like schedule for daily verses |
 | `DEFAULT_VERSION` | ❌ | `ESV` | Default Bible version |
 | `TIMEZONE` | ❌ | `America/New_York` | Timezone for daily verse schedule |
@@ -155,7 +155,7 @@ Supported formats:
 ### Project Structure
 
 ```
-deno-biblebot/
+primascriptura/
 ├── src/
 │   ├── main.ts              # Bot entry point
 │   ├── deploy.ts            # Command deployment script
@@ -217,8 +217,8 @@ MIT License - see LICENSE file for details
 
 ## 💡 Tips
 
-- **Testing**: Use `DISCORD_GUILD_ID` during development for instant command updates
-- **Global Commands**: Without `DISCORD_GUILD_ID`, commands can take up to an hour to appear
+- **Testing**: Use `PRIMASCRIPTURA_GUILD_ID` during development for instant command updates
+- **Global Commands**: Without `PRIMASCRIPTURA_GUILD_ID`, commands can take up to an hour to appear
 - **Daily Verses**: The scheduler uses a rotating list of popular verses
 - **Rate Limits**: The bot respects Discord's API rate limits
 
@@ -231,7 +231,7 @@ MIT License - see LICENSE file for details
 
 **Bot not responding?**
 - Check console for error messages
-- Verify `DISCORD_TOKEN` is correct
+- Verify `PRIMASCRIPTURA_DISCORD_TOKEN` is correct
 - Ensure bot has permission to send messages in the channel
 
 **Daily verses not sending?**

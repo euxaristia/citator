@@ -1,5 +1,5 @@
 {
-  "name": "citator",
+  "name": "primascriptura",
   "version": "1.0.0",
   "description": "A Discord Bible bot built with Deno - delivers scripture directly from Discord",
   "tasks": {

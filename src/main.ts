@@ -1,7 +1,7 @@
 /**
- * BibleBot for Discord
+ * PrimaScriptura - Discord Bible Bot
  * A Deno-based Discord bot for delivering scripture
- * 
+ *
  * Scripture from your Discord client to your heart ❤️
  */
 
@@ -11,26 +11,26 @@ import { DailyVerseScheduler } from "./services/scheduler.ts";
 import { createCommandHandlers, createCommandDefinitions } from "./commands/commands.ts";
 import { MessageHandler } from "./services/message-handler.ts";
 
-const CITATOR_DISCORD_TOKEN = Deno.env.get("CITATOR_DISCORD_TOKEN");
-const CITATOR_CLIENT_ID = Deno.env.get("CITATOR_CLIENT_ID");
-const CITATOR_GUILD_ID = Deno.env.get("CITATOR_GUILD_ID");
+const PRIMASCRIPTURA_DISCORD_TOKEN = Deno.env.get("PRIMASCRIPTURA_DISCORD_TOKEN");
+const PRIMASCRIPTURA_CLIENT_ID = Deno.env.get("PRIMASCRIPTURA_CLIENT_ID");
+const PRIMASCRIPTURA_GUILD_ID = Deno.env.get("PRIMASCRIPTURA_GUILD_ID");
 const DAILY_VERSE_SCHEDULE = Deno.env.get("DAILY_VERSE_SCHEDULE") || "0 8 * * *";
 const DEFAULT_VERSION = Deno.env.get("DEFAULT_VERSION") || "KJV";
 const TIMEZONE = Deno.env.get("TIMEZONE") || "America/New_York";
 
-if (!CITATOR_DISCORD_TOKEN) {
-  console.error("❌ Missing required environment variable: CITATOR_DISCORD_TOKEN");
+if (!PRIMASCRIPTURA_DISCORD_TOKEN) {
+  console.error("❌ Missing required environment variable: PRIMASCRIPTURA_DISCORD_TOKEN");
   Deno.exit(1);
 }
 
 // Get client ID from env or fetch from API
-let clientId = CITATOR_CLIENT_ID;
+let clientId = PRIMASCRIPTURA_CLIENT_ID;
 if (!clientId) {
-  console.log("⏳ No CITATOR_CLIENT_ID provided, fetching from Discord API...");
+  console.log("⏳ No PRIMASCRIPTURA_CLIENT_ID provided, fetching from Discord API...");
   try {
     const response = await fetch("https://discord.com/api/v10/users/@me", {
       headers: {
-        Authorization: `Bot ${CITATOR_DISCORD_TOKEN}`,
+        Authorization: `Bot ${PRIMASCRIPTURA_DISCORD_TOKEN}`,
       },
     });
     if (!response.ok) {
@@ -41,7 +41,7 @@ if (!clientId) {
     console.log(`✅ Found client ID: ${clientId}`);
   } catch (error) {
     console.error("❌ Failed to fetch client ID:", error);
-    console.error("   Please set CITATOR_CLIENT_ID environment variable");
+    console.error("   Please set PRIMASCRIPTURA_CLIENT_ID environment variable");
     Deno.exit(1);
   }
 }
@@ -53,16 +53,16 @@ const commandHandlers = createCommandHandlers(bibleService);
 
 // Deploy slash commands on startup
 console.log("📝 Registering slash commands...");
-const rest = new REST({ version: "10" }).setToken(CITATOR_DISCORD_TOKEN);
+const rest = new REST({ version: "10" }).setToken(PRIMASCRIPTURA_DISCORD_TOKEN);
 const commands = createCommandDefinitions();
 
 try {
-  if (CITATOR_GUILD_ID) {
+  if (PRIMASCRIPTURA_GUILD_ID) {
     await rest.put(
-      Routes.applicationGuildCommands(clientId, CITATOR_GUILD_ID),
+      Routes.applicationGuildCommands(clientId, PRIMASCRIPTURA_GUILD_ID),
       { body: commands }
     );
-    console.log(`✅ Registered guild commands for server ${CITATOR_GUILD_ID}`);
+    console.log(`✅ Registered guild commands for server ${PRIMASCRIPTURA_GUILD_ID}`);
   } else {
     await rest.put(
       Routes.applicationCommands(clientId),
@@ -236,7 +236,7 @@ client.on("guildMemberAdd", async (member) => {
 
 // Connect to Discord
 try {
-  await client.login(CITATOR_DISCORD_TOKEN);
+  await client.login(PRIMASCRIPTURA_DISCORD_TOKEN);
   console.log("✅ Connected to Discord");
 } catch (error) {
   console.error("❌ Failed to connect to Discord:", error);
