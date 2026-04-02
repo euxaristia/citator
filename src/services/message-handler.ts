@@ -23,7 +23,7 @@ const BOOKS_WITH_OF = ["song of solomon", "song of songs"];
 export interface DetectedReference {
   book: string;
   chapter: number;
-  verseStart: number;
+  verseStart?: number;
   verseEnd?: number;
   originalMatch: string;
 }
@@ -131,7 +131,7 @@ export class MessageHandler {
         detected.push({
           book: fullBookName,
           chapter,
-          verseStart: 1,
+          verseStart: undefined,
           verseEnd: undefined,
           originalMatch: fullMatch,
         });

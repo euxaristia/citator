@@ -217,7 +217,7 @@ Deno.test("MessageHandler - detectChapterReferences - John 3", () => {
   assertEquals(refs.length, 1);
   assertEquals(refs[0].book.toLowerCase(), "john");
   assertEquals(refs[0].chapter, 3);
-  assertEquals(refs[0].verseStart, 1);
+  assertEquals(refs[0].verseStart, undefined);
   assertEquals(refs[0].verseEnd, undefined);
 });
 
@@ -230,7 +230,7 @@ Deno.test("MessageHandler - detectChapterReferences - Psalm 23", () => {
   assertEquals(refs.length, 1);
   assertEquals(refs[0].book.toLowerCase(), "psalm");
   assertEquals(refs[0].chapter, 23);
-  assertEquals(refs[0].verseStart, 1);
+  assertEquals(refs[0].verseStart, undefined);
 });
 
 Deno.test("MessageHandler - detectChapterReferences - 1 Corinthians 13", () => {
@@ -242,7 +242,7 @@ Deno.test("MessageHandler - detectChapterReferences - 1 Corinthians 13", () => {
   assertEquals(refs.length, 1);
   assertEquals(refs[0].book.toLowerCase(), "1 corinthians");
   assertEquals(refs[0].chapter, 13);
-  assertEquals(refs[0].verseStart, 1);
+  assertEquals(refs[0].verseStart, undefined);
 });
 
 Deno.test("MessageHandler - detectChapterReferences - Romans 8", () => {
@@ -254,7 +254,7 @@ Deno.test("MessageHandler - detectChapterReferences - Romans 8", () => {
   assertEquals(refs.length, 1);
   assertEquals(refs[0].book.toLowerCase(), "romans");
   assertEquals(refs[0].chapter, 8);
-  assertEquals(refs[0].verseStart, 1);
+  assertEquals(refs[0].verseStart, undefined);
 });
 
 Deno.test("MessageHandler - detectChapterReferences - chapter at start of line", () => {
@@ -266,7 +266,7 @@ Deno.test("MessageHandler - detectChapterReferences - chapter at start of line",
   assertEquals(refs.length, 1);
   assertEquals(refs[0].book.toLowerCase(), "john");
   assertEquals(refs[0].chapter, 3);
-  assertEquals(refs[0].verseStart, 1);
+  assertEquals(refs[0].verseStart, undefined);
 });
 
 Deno.test("MessageHandler - detectChapterReferences - chapter at end of line", () => {
@@ -278,7 +278,7 @@ Deno.test("MessageHandler - detectChapterReferences - chapter at end of line", (
   assertEquals(refs.length, 1);
   assertEquals(refs[0].book.toLowerCase(), "john");
   assertEquals(refs[0].chapter, 3);
-  assertEquals(refs[0].verseStart, 1);
+  assertEquals(refs[0].verseStart, undefined);
 });
 
 Deno.test("MessageHandler - detectChapterReferences - chapter in parentheses", () => {
@@ -290,7 +290,7 @@ Deno.test("MessageHandler - detectChapterReferences - chapter in parentheses", (
   assertEquals(refs.length, 1);
   assertEquals(refs[0].book.toLowerCase(), "john");
   assertEquals(refs[0].chapter, 3);
-  assertEquals(refs[0].verseStart, 1);
+  assertEquals(refs[0].verseStart, undefined);
 });
 
 Deno.test("MessageHandler - detectChapterReferences - no chapter reference", () => {
@@ -321,7 +321,7 @@ Deno.test("MessageHandler - detectChapterReferences - Song of Solomon 2", () => 
   assertEquals(refs.length, 1);
   assertEquals(refs[0].book.toLowerCase(), "song of solomon");
   assertEquals(refs[0].chapter, 2);
-  assertEquals(refs[0].verseStart, 1);
+  assertEquals(refs[0].verseStart, undefined);
 });
 
 Deno.test("MessageHandler - detectChapterReferences - 2 Samuel 7", () => {
@@ -333,5 +333,5 @@ Deno.test("MessageHandler - detectChapterReferences - 2 Samuel 7", () => {
   assertEquals(refs.length, 1);
   assertEquals(refs[0].book.toLowerCase(), "2 samuel");
   assertEquals(refs[0].chapter, 7);
-  assertEquals(refs[0].verseStart, 1);
+  assertEquals(refs[0].verseStart, undefined);
 });
