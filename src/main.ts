@@ -75,6 +75,8 @@ try {
 }
 
 // Create Discord client with WebSocket support
+// Note: MessageContent is a privileged intent requiring Discord verification
+// Enable it at: https://discord.com/developers/applications/{CLIENT_ID}/bot
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
