@@ -5,10 +5,11 @@
  * Scripture from your Discord client to your heart ❤️
  */
 
-import { Client, GatewayIntentBits, REST, Routes, EmbedBuilder } from "npm:discord.js";
+import { Client, GatewayIntentBits, REST, Routes, EmbedBuilder, Message } from "npm:discord.js";
 import { BibleService } from "./services/bible.ts";
 import { DailyVerseScheduler } from "./services/scheduler.ts";
 import { createCommandHandlers, createCommandDefinitions } from "./commands/commands.ts";
+import { MessageHandler } from "./services/message-handler.ts";
 
 const CITATOR_DISCORD_TOKEN = Deno.env.get("CITATOR_DISCORD_TOKEN");
 const CITATOR_CLIENT_ID = Deno.env.get("CITATOR_CLIENT_ID");
@@ -47,6 +48,7 @@ if (!clientId) {
 
 // Initialize services
 const bibleService = new BibleService(DEFAULT_VERSION);
+const messageHandler = new MessageHandler(bibleService, DEFAULT_VERSION);
 const commandHandlers = createCommandHandlers(bibleService);
 
 // Deploy slash commands on startup
@@ -77,6 +79,8 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
   ],
 });
 
@@ -168,6 +172,15 @@ client.on("interactionCreate", async (interaction) => {
     await interaction.editReply({
       content: "❌ An error occurred while processing your request.",
     });
+  }
+});
+
+// Event: Message (auto-detect verse references)
+client.on("messageCreate", async (message: Message) => {
+  try {
+    await messageHandler.processMessage(message);
+  } catch (error) {
+    console.error(`[MessageHandler] Error processing message:`, error instanceof Error ? error.message : error);
   }
 });
 
