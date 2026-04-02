@@ -196,7 +196,7 @@ export class BibleService {
 
     // bolls.life returns a flat array of verses
     const filteredVerses = data.filter(
-      (verse: any) => verse.verse >= verseStart && (verseEnd === undefined || verse.verse <= verseEnd)
+      (verse: any) => verse.verse >= verseStart && (verseEnd === undefined ? verse.verse === verseStart : verse.verse <= verseEnd)
     );
 
     if (filteredVerses.length === 0) {
