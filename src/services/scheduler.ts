@@ -3,6 +3,7 @@
  * Automatically posts verse of the day to configured channels
  */
 
+import { EmbedBuilder } from "discord.js";
 import { BibleService } from "../services/bible.ts";
 
 export interface ScheduledChannel {
@@ -15,14 +16,14 @@ export class DailyVerseScheduler {
   private schedule: string;
   private timezone: string;
   private channels: ScheduledChannel[] = [];
-  private sendToChannel: (channelId: string, message: string) => Promise<void>;
+  private sendToChannel: (channelId: string, embed: EmbedBuilder) => Promise<void>;
   private timerId: number | null = null;
 
   constructor(
     bibleService: BibleService,
     schedule: string,
     timezone: string,
-    sendToChannel: (channelId: string, message: string) => Promise<void>
+    sendToChannel: (channelId: string, embed: EmbedBuilder) => Promise<void>
   ) {
     this.bibleService = bibleService;
     this.schedule = schedule;
@@ -113,12 +114,12 @@ export class DailyVerseScheduler {
 
     try {
       const verse = await this.bibleService.getVerseOfTheDay();
-      const message = `🌟 **Daily Verse**\n\n${verse.text}\n\n*${verse.reference} (${verse.version})*\n\n_Have a blessed day!_ ✨`;
+      const embed = this.bibleService.createVerseEmbed([verse], "Daily Verse");
 
       // Send to all channels
       for (const channel of this.channels) {
         try {
-          await this.sendToChannel(channel.channelId, message);
+          await this.sendToChannel(channel.channelId, embed);
           console.log(`[Scheduler] Sent to channel ${channel.channelId}`);
         } catch (error) {
           console.error(

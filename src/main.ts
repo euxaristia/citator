@@ -5,7 +5,7 @@
  * Scripture from your Discord client to your heart ❤️
  */
 
-import { Client, GatewayIntentBits, REST, Routes } from "npm:discord.js";
+import { Client, GatewayIntentBits, REST, Routes, EmbedBuilder } from "npm:discord.js";
 import { BibleService } from "./services/bible.ts";
 import { DailyVerseScheduler } from "./services/scheduler.ts";
 import { createCommandHandlers, createCommandDefinitions } from "./commands/commands.ts";
@@ -89,10 +89,10 @@ const MIN_ACCOUNT_AGE = 2 * 24 * 60 * 60 * 1000;
 /**
  * Send a message to a channel
  */
-async function sendToChannel(channelId: string, message: string): Promise<void> {
+async function sendToChannel(channelId: string, embed: EmbedBuilder): Promise<void> {
   try {
     await client.api.channels[channelId].messages.post({
-      body: { content: message },
+      body: { embeds: [embed.toJSON()] },
     });
   } catch (error) {
     console.error(`Failed to send to channel ${channelId}:`, error);
@@ -151,7 +151,7 @@ client.on("interactionCreate", async (interaction) => {
   try {
     // Extract command arguments
     const args: any = {};
-    
+
     if (commandName === "verse") {
       args.reference = interaction.options.getString("reference", true);
       args.version = interaction.options.getString("version") || undefined;
@@ -162,7 +162,7 @@ client.on("interactionCreate", async (interaction) => {
     // Execute command
     const response = await handler.execute(args);
 
-    await interaction.editReply({ content: response });
+    await interaction.editReply(response);
   } catch (error) {
     console.error(`Error executing ${commandName}:`, error);
     await interaction.editReply({

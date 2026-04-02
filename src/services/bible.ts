@@ -3,6 +3,8 @@
  * Supports both bible-api.com and bolls.life APIs
  */
 
+import { EmbedBuilder } from "discord.js";
+
 const BIBLE_API_BASE = "https://bible-api.com";
 const BOLLS_API_BASE = "https://bolls.life";
 
@@ -322,6 +324,55 @@ export class BibleService {
     const truncatedText = fullText.slice(0, maxTextLength).trim() + "...";
     
     return header + truncatedText + footer + note;
+  }
+
+  /**
+   * Create a Discord embed for verses
+   */
+  createVerseEmbed(verses: BibleVerse[], title?: string): EmbedBuilder {
+    if (verses.length === 0) {
+      return new EmbedBuilder().setColor(0x5865F2).setDescription("No verses found.");
+    }
+
+    const version = verses[0].version;
+    const reference = this.formatReference(verses);
+    const fullText = verses.map(v => v.text).join(" ");
+    
+    // Version display names
+    const versionNames: Record<string, string> = {
+      "KJV": "King James Version",
+      "WEB": "World English Bible",
+      "BBE": "Bible in Basic English",
+      "DRB": "Douay-Rheims Bible",
+      "WMB": "World Messianic Bible",
+      "WMBBE": "WMB British Edition",
+      "VULG": "Latin Vulgate",
+      "WLC": "Westminster Leningrad Codex",
+      "LXX": "Septuagint",
+      "SBLGNT": "SBL Greek New Testament",
+      "BYZ": "Byzantine Textform",
+      "MT": "Masoretic Text",
+      "TR": "Textus Receptus",
+    };
+
+    const versionDisplayName = versionNames[version] || version;
+    const embedTitle = title ? `${title}` : `${reference}`;
+    
+    const embed = new EmbedBuilder()
+      .setColor(0x5865F2)
+      .setTitle(embedTitle)
+      .setDescription(fullText)
+      .setFooter({ text: `${reference} - ${versionDisplayName}` });
+
+    // Add truncation notice if needed
+    const fullMessage = fullText.length + reference.length + versionDisplayName.length + 50;
+    if (fullMessage > 2000) {
+      const truncatedText = fullText.slice(0, 1900).trim() + "...";
+      embed.setDescription(truncatedText);
+      embed.setFooter({ text: `${reference} - ${versionDisplayName} (Passage truncated due to Discord's limit)` });
+    }
+
+    return embed;
   }
 
   /**

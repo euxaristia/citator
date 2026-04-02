@@ -240,6 +240,87 @@ Deno.test("BibleService - formatVerses - does not truncate short passages", () =
   assertEquals(result.includes(shortText), true);
 });
 
+Deno.test("BibleService - createVerseEmbed - single verse", () => {
+  const service = new BibleService();
+  const verses = [{
+    book: "John",
+    chapter: 3,
+    verse: 16,
+    text: "For God so loved the world",
+    version: "KJV",
+    reference: "John 3:16",
+  }];
+
+  const embed = service.createVerseEmbed(verses);
+  const json = embed.toJSON();
+
+  assertEquals(json.title, "John 3:16");
+  assertEquals(json.description, "For God so loved the world");
+  assertEquals(json.footer?.text, "John 3:16 - King James Version");
+  assertEquals(json.color, 0x5865F2);
+});
+
+Deno.test("BibleService - createVerseEmbed - with custom title", () => {
+  const service = new BibleService();
+  const verses = [{
+    book: "John",
+    chapter: 3,
+    verse: 16,
+    text: "For God so loved the world",
+    version: "WEB",
+    reference: "John 3:16",
+  }];
+
+  const embed = service.createVerseEmbed(verses, "Daily Verse");
+  const json = embed.toJSON();
+
+  assertEquals(json.title, "Daily Verse");
+  assertEquals(json.footer?.text, "John 3:16 - World English Bible");
+});
+
+Deno.test("BibleService - createVerseEmbed - empty array", () => {
+  const service = new BibleService();
+  const embed = service.createVerseEmbed([]);
+  const json = embed.toJSON();
+
+  assertEquals(json.description, "No verses found.");
+  assertEquals(json.color, 0x5865F2);
+});
+
+Deno.test("BibleService - createVerseEmbed - Latin Vulgate version", () => {
+  const service = new BibleService();
+  const verses = [{
+    book: "John",
+    chapter: 3,
+    verse: 16,
+    text: "Sic enim Deus dilexit mundum",
+    version: "VULG",
+    reference: "John 3:16",
+  }];
+
+  const embed = service.createVerseEmbed(verses);
+  const json = embed.toJSON();
+
+  assertEquals(json.footer?.text, "John 3:16 - Latin Vulgate");
+});
+
+Deno.test("BibleService - createVerseEmbed - Greek version", () => {
+  const service = new BibleService();
+  const verses = [{
+    book: "John",
+    chapter: 3,
+    verse: 16,
+    text: "Οὕτως γὰρ ἠγάπησεν ὁ θεὸς τὸν κόσμον",
+    version: "SBLGNT",
+    reference: "John 3:16",
+  }];
+
+  const embed = service.createVerseEmbed(verses);
+  const json = embed.toJSON();
+
+  assertEquals(json.footer?.text, "John 3:16 - SBL Greek New Testament");
+});
+
 Deno.test("BibleService - getVersions - returns array", async () => {
   const service = new BibleService();
   const versions = await service.getVersions();

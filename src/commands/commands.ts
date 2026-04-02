@@ -2,13 +2,13 @@
  * Discord Slash Commands
  */
 
-import { APIApplicationCommandOptionChoice, ChatInputCommandInteraction } from "discord.js";
+import { APIApplicationCommandOptionChoice, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { BibleService, BibleVerse } from "../services/bible.ts";
 
 export interface CommandHandler {
   name: string;
   description: string;
-  execute: (args: any) => Promise<string>;
+  execute: (args: any) => Promise<{ embeds?: EmbedBuilder[]; content?: string }>;
 }
 
 /**
@@ -94,7 +94,9 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
         const parsed = bibleService.parseReference(args.reference);
 
         if (!parsed) {
-          return "❌ Invalid Bible reference. Please use format: `Book Chapter:Verse` (e.g., `John 3:16` or `Psalm 23:1-6`)";
+          return {
+            content: "❌ Invalid Bible reference. Please use format: `Book Chapter:Verse` (e.g., `John 3:16` or `Psalm 23:1-6`)",
+          };
         }
 
         try {
@@ -108,15 +110,15 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
           );
 
           if (verses.length === 0) {
-            return "❌ No verses found for that reference.";
+            return { content: "❌ No verses found for that reference." };
           }
 
-          const formatted = bibleService.formatVerses(verses);
-          return formatted;
+          const embed = bibleService.createVerseEmbed(verses);
+          return { embeds: [embed] };
         } catch (error) {
           const errorMsg = error instanceof Error ? error.message : "Unknown error occurred";
           console.error(`[Command] /verse error:`, errorMsg);
-          return `❌ Error: ${errorMsg}`;
+          return { content: `❌ Error: ${errorMsg}` };
         }
       },
     },
@@ -126,9 +128,10 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
       execute: async () => {
         try {
           const verse = await bibleService.getVerseOfTheDay();
-          return `🌟 **Verse of the Day**\n\n${verse.text}\n\n*${verse.reference} (${verse.version})*`;
+          const embed = bibleService.createVerseEmbed([verse], "Verse of the Day");
+          return { embeds: [embed] };
         } catch (error) {
-          return `❌ Error fetching verse of the day: ${error instanceof Error ? error.message : "Unknown error"}`;
+          return { content: `❌ Error fetching verse of the day: ${error instanceof Error ? error.message : "Unknown error"}` };
         }
       },
     },
@@ -224,7 +227,8 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
 
               if (verses.length > 0) {
                 const verse = verses[0];
-                return `🎲 **Random Verse**\n\n${verse.text}\n\n*${verse.reference} (${verse.version})*`;
+                const embed = bibleService.createVerseEmbed([verse], "Random Verse");
+                return { embeds: [embed] };
               }
             } catch {
               // Try again if this reference doesn't work
@@ -232,9 +236,9 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
             }
           }
 
-          return "❌ Could not generate a random verse. Please try again.";
+          return { content: "❌ Could not generate a random verse. Please try again." };
         } catch (error) {
-          return `❌ Error: ${error instanceof Error ? error.message : "Unknown error occurred"}`;
+          return { content: `❌ Error: ${error instanceof Error ? error.message : "Unknown error occurred"}` };
         }
       },
     },
@@ -242,58 +246,63 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
       name: "versions",
       description: "List available Bible versions",
       execute: async () => {
-        const versions = [
-          "**📚 Available Bible Versions:**\n",
-          "**Modern English (bible-api.com):**",
-          "• KJV - King James Version",
-          "• WEB - World English Bible",
-          "• BBE - Bible in Basic English",
-          "• DRB - Douay-Rheims Bible",
-          "• WMB - World Messianic Bible",
-          "• WMBBE - WMB British Edition",
-          "",
-          "**Original Languages & Latin (bolls.life):**",
-          "• VULG - Latin Vulgate",
-          "• WLC - Hebrew (Westminster Leningrad Codex)",
-          "• LXX - Greek Septuagint (Old Testament)",
-          "• SBLGNT - Greek New Testament",
-          "• BYZ - Byzantine Textform (Greek NT)",
-          "• MT - Masoretic Text (Hebrew)",
-          "• TR - Textus Receptus (Greek NT)",
-          "\n*Use `/verse` with the version parameter to specify a translation.*",
-        ].join("\n");
+        const embed = new EmbedBuilder()
+          .setColor(0x5865F2)
+          .setTitle("📚 Available Bible Versions")
+          .addFields(
+            {
+              name: "Modern English (bible-api.com)",
+              value: "KJV, WEB, BBE, DRB, WMB, WMBBE",
+              inline: false,
+            },
+            {
+              name: "Original Languages & Latin (bolls.life)",
+              value: "VULG, WLC, LXX, SBLGNT, BYZ, MT, TR",
+              inline: false,
+            }
+          )
+          .setFooter({ text: "Use /verse with the version parameter to specify a translation" });
 
-        return versions;
+        return { embeds: [embed] };
       },
     },
     {
       name: "help",
       description: "Show help information and available commands",
       execute: async () => {
-        const helpText = [
-          "**📖 Citator Help**",
-          "",
-          "**Available Commands:**",
-          "• `/verse <reference> [version]` - Get a specific Bible verse",
-          "  Example: `/verse John 3:16 KJV`",
-          "  Example: `/verse Psalm 23:1-6 WEB`",
-          "  Example: `/verse John 1:1 SBLGNT` (Greek)",
-          "  Example: `/verse Psalm 23:1 WLC` (Hebrew)",
-          "",
-          "• `/daily` - Get the verse of the day",
-          "",
-          "• `/random [version]` - Get a random Bible verse",
-          "",
-          "• `/versions` - List all available Bible versions",
-          "",
-          "• `/help` - Show this help message",
-          "",
-          "**13 Versions Available:** KJV, WEB, BBE, DRB, WMB, WMBBE, VULG, WLC, LXX, SBLGNT, BYZ, MT, TR",
-          "",
-          "*Scripture from your Discord client to your heart* ❤️",
-        ].join("\n");
+        const embed = new EmbedBuilder()
+          .setColor(0x5865F2)
+          .setTitle("📖 Citator Help")
+          .addFields(
+            {
+              name: "/verse <reference> [version]",
+              value: "Get a specific Bible verse\nExample: `/verse John 3:16 KJV`",
+              inline: false,
+            },
+            {
+              name: "/daily",
+              value: "Get the verse of the day",
+              inline: true,
+            },
+            {
+              name: "/random [version]",
+              value: "Get a random Bible verse",
+              inline: true,
+            },
+            {
+              name: "/versions",
+              value: "List all available Bible versions",
+              inline: true,
+            },
+            {
+              name: "Available Versions",
+              value: "KJV, WEB, BBE, DRB, WMB, WMBBE, VULG, WLC, LXX, SBLGNT, BYZ, MT, TR",
+              inline: false,
+            }
+          )
+          .setFooter({ text: "Scripture from your Discord client to your heart ❤️" });
 
-        return helpText;
+        return { embeds: [embed] };
       },
     },
   ];
