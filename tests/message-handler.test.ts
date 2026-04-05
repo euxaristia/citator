@@ -26,7 +26,7 @@ Deno.test("MessageHandler - detectVerseReferences - Psalm 23:1-6", () => {
   const refs = handler.detectVerseReferences("Psalm 23:1-6 is my favorite passage.");
 
   assertEquals(refs.length, 1);
-  assertEquals(refs[0].book.toLowerCase(), "psalm");
+  assertEquals(refs[0].book.toLowerCase(), "psalms");
   assertEquals(refs[0].chapter, 23);
   assertEquals(refs[0].verseStart, 1);
   assertEquals(refs[0].verseEnd, 6);
@@ -228,7 +228,7 @@ Deno.test("MessageHandler - detectChapterReferences - Psalm 23", () => {
   const refs = handler.detectChapterReferences("Psalm 23 is the shepherd psalm.");
 
   assertEquals(refs.length, 1);
-  assertEquals(refs[0].book.toLowerCase(), "psalm");
+  assertEquals(refs[0].book.toLowerCase(), "psalms");
   assertEquals(refs[0].chapter, 23);
   assertEquals(refs[0].verseStart, undefined);
 });
@@ -479,4 +479,125 @@ Deno.test("MessageHandler - detectVersion - chapter reference", () => {
 
   const version = handler.detectVersion("Read John 1 Greek NT");
   assertEquals(version, "SBLGNT");
+});
+
+// Abbreviated book name tests
+Deno.test("MessageHandler - detectVerseReferences - 1 Cor 3:16", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("Read 1 Cor 3:16 today.");
+
+  assertEquals(refs.length, 1);
+  assertEquals(refs[0].book.toLowerCase(), "1 corinthians");
+  assertEquals(refs[0].chapter, 3);
+  assertEquals(refs[0].verseStart, 16);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - 2 Cor 5:17", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("2 Cor 5:17 is powerful.");
+
+  assertEquals(refs.length, 1);
+  assertEquals(refs[0].book.toLowerCase(), "2 corinthians");
+  assertEquals(refs[0].chapter, 5);
+  assertEquals(refs[0].verseStart, 17);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - 1 Corinth 3:16", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("Read 1 Corinth 3:16 today.");
+
+  assertEquals(refs.length, 1);
+  assertEquals(refs[0].book.toLowerCase(), "1 corinthians");
+  assertEquals(refs[0].chapter, 3);
+  assertEquals(refs[0].verseStart, 16);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - 2 Corinth 5:17", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("2 Corinth 5:17 is powerful.");
+
+  assertEquals(refs.length, 1);
+  assertEquals(refs[0].book.toLowerCase(), "2 corinthians");
+  assertEquals(refs[0].chapter, 5);
+  assertEquals(refs[0].verseStart, 17);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - 1 Sam 1:1", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("1 Sam 1:1 starts the story.");
+
+  assertEquals(refs.length, 1);
+  assertEquals(refs[0].book.toLowerCase(), "1 samuel");
+  assertEquals(refs[0].chapter, 1);
+  assertEquals(refs[0].verseStart, 1);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - 2 Ki 5:14", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("2 Ki 5:14 tells of Naaman's healing.");
+
+  assertEquals(refs.length, 1);
+  assertEquals(refs[0].book.toLowerCase(), "2 kings");
+  assertEquals(refs[0].chapter, 5);
+  assertEquals(refs[0].verseStart, 14);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - 1 Pet 1:3", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("1 Pet 1:3 speaks of living hope.");
+
+  assertEquals(refs.length, 1);
+  assertEquals(refs[0].book.toLowerCase(), "1 peter");
+  assertEquals(refs[0].chapter, 1);
+  assertEquals(refs[0].verseStart, 3);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - 1 Jn 1:9", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("1 Jn 1:9 promises forgiveness.");
+
+  assertEquals(refs.length, 1);
+  assertEquals(refs[0].book.toLowerCase(), "1 john");
+  assertEquals(refs[0].chapter, 1);
+  assertEquals(refs[0].verseStart, 9);
+});
+
+Deno.test("MessageHandler - detectChapterReferences - 1 Cor 13", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectChapterReferences("1 Cor 13 is the love chapter.");
+
+  assertEquals(refs.length, 1);
+  assertEquals(refs[0].book.toLowerCase(), "1 corinthians");
+  assertEquals(refs[0].chapter, 13);
+  assertEquals(refs[0].verseStart, undefined);
+});
+
+Deno.test("MessageHandler - detectChapterReferences - 2 Cor 5", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectChapterReferences("2 Cor 5 talks about new creation.");
+
+  assertEquals(refs.length, 1);
+  assertEquals(refs[0].book.toLowerCase(), "2 corinthians");
+  assertEquals(refs[0].chapter, 5);
+  assertEquals(refs[0].verseStart, undefined);
 });

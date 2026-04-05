@@ -154,6 +154,89 @@ const BOLLS_ONLY_VERSIONS = ["VULG", "WLC", "LXX", "SBLGNT", "BYZ", "MT", "TR"];
 // bible-api.com versions
 const BIBLE_API_VERSIONS = ["KJV", "WEB", "BBE", "DRB", "WMB", "WMBBE"];
 
+// Abbreviation to full book name mapping for parseReference
+const ABBREVIATION_MAP: Record<string, string> = {
+  "1 corinthians": "1 corinthians",
+  "1 corinth": "1 corinthians",
+  "1 cor": "1 corinthians",
+  "2 corinthians": "2 corinthians",
+  "2 corinth": "2 corinthians",
+  "2 cor": "2 corinthians",
+  "1 samuel": "1 samuel",
+  "1 sam": "1 samuel",
+  "2 samuel": "2 samuel",
+  "2 sam": "2 samuel",
+  "1 kings": "1 kings",
+  "1 ki": "1 kings",
+  "2 kings": "2 kings",
+  "2 ki": "2 kings",
+  "1 chronicles": "1 chronicles",
+  "1 ch": "1 chronicles",
+  "2 chronicles": "2 chronicles",
+  "2 ch": "2 chronicles",
+  "1 thessalonians": "1 thessalonians",
+  "1 thes": "1 thessalonians",
+  "2 thessalonians": "2 thessalonians",
+  "2 thes": "2 thessalonians",
+  "1 timothy": "1 timothy",
+  "1 tim": "1 timothy",
+  "2 timothy": "2 timothy",
+  "2 tim": "2 timothy",
+  "1 peter": "1 peter",
+  "1 pet": "1 peter",
+  "2 peter": "2 peter",
+  "2 pet": "2 peter",
+  "1 john": "1 john",
+  "1 jn": "1 john",
+  "2 john": "2 john",
+  "2 jn": "2 john",
+  "3 john": "3 john",
+  "3 jn": "3 john",
+  "psalms": "psalms",
+  "psalm": "psalms",
+  "song of solomon": "song of solomon",
+  "song of songs": "song of solomon",
+};
+
+/**
+ * Normalize a book name from abbreviations or partial names to the full canonical name
+ */
+function normalizeBookName(bookName: string): string {
+  const normalized = bookName.toLowerCase().trim();
+  
+  if (ABBREVIATION_MAP[normalized]) {
+    return ABBREVIATION_MAP[normalized];
+  }
+  
+  // Try prefix matching for partial book names
+  const candidates = Object.entries(ABBREVIATION_MAP)
+    .filter(([abbrev, full]) => full.startsWith(normalized) || abbrev.startsWith(normalized))
+    .map(([_, full]) => full);
+  
+  if (candidates.length === 1) {
+    return candidates[0];
+  }
+  
+  if (candidates.length > 1) {
+    const sortedCandidates = candidates.sort((a, b) => {
+      const aMinAbbrev = Math.min(...Object.entries(ABBREVIATION_MAP)
+        .filter(([_, full]) => full === a)
+        .map(([abbrev, _]) => abbrev.length));
+      const bMinAbbrev = Math.min(...Object.entries(ABBREVIATION_MAP)
+        .filter(([_, full]) => full === b)
+        .map(([abbrev, _]) => abbrev.length));
+      return aMinAbbrev - bMinAbbrev;
+    });
+    return sortedCandidates[0];
+  }
+  
+  // No match found, return the original with proper casing
+  // Use title case for consistency
+  return bookName.trim().split(' ').map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  ).join(' ');
+}
+
 export interface BibleVerse {
   book: string;
   chapter: number;
@@ -574,7 +657,7 @@ export class BibleService {
       if (match) {
         const [, book, chapter, verseStart, verseEnd] = match;
         return {
-          book: book.trim(),
+          book: normalizeBookName(book.trim()),
           chapter: parseInt(chapter),
           verseStart: parseInt(verseStart),
           verseEnd: verseEnd ? parseInt(verseEnd) : undefined,
@@ -588,7 +671,7 @@ export class BibleService {
     if (chapterMatch) {
       const [, book, chapter] = chapterMatch;
       return {
-        book: book.trim(),
+        book: normalizeBookName(book.trim()),
         chapter: parseInt(chapter),
       };
     }

@@ -22,7 +22,7 @@ Deno.test("BibleService - parseReference - verse range", () => {
   const result = service.parseReference("Psalm 23:1-6");
 
   assertEquals(result, {
-    book: "Psalm",
+    book: "psalms",
     chapter: 23,
     verseStart: 1,
     verseEnd: 6,
@@ -34,7 +34,7 @@ Deno.test("BibleService - parseReference - book with number", () => {
   const result = service.parseReference("1 John 1:9");
 
   assertExists(result);
-  assertEquals(result.book, "1 John");
+  assertEquals(result.book.toLowerCase(), "1 john");
   assertEquals(result.chapter, 1);
   assertEquals(result.verseStart, 9);
 });
@@ -44,7 +44,7 @@ Deno.test("BibleService - parseReference - multi-word book", () => {
   const result = service.parseReference("Song of Solomon 2:10");
 
   assertExists(result);
-  assertEquals(result.book, "Song of Solomon");
+  assertEquals(result.book.toLowerCase(), "song of solomon");
   assertEquals(result.chapter, 2);
   assertEquals(result.verseStart, 10);
 });
@@ -369,4 +369,85 @@ Deno.test("BibleService - search - throws error", async () => {
     Error,
     "Text search is not available",
   );
+});
+
+// Abbreviated book name tests for parseReference
+Deno.test("BibleService - parseReference - abbreviated 1 Cor", () => {
+  const service = new BibleService();
+  const result = service.parseReference("1 Cor 3:16");
+
+  assertExists(result);
+  assertEquals(result.book, "1 corinthians");
+  assertEquals(result.chapter, 3);
+  assertEquals(result.verseStart, 16);
+});
+
+Deno.test("BibleService - parseReference - abbreviated 2 Cor", () => {
+  const service = new BibleService();
+  const result = service.parseReference("2 Cor 5:17");
+
+  assertExists(result);
+  assertEquals(result.book, "2 corinthians");
+  assertEquals(result.chapter, 5);
+  assertEquals(result.verseStart, 17);
+});
+
+Deno.test("BibleService - parseReference - partial 1 Corinth", () => {
+  const service = new BibleService();
+  const result = service.parseReference("1 Corinth 3:16");
+
+  assertExists(result);
+  assertEquals(result.book, "1 corinthians");
+  assertEquals(result.chapter, 3);
+  assertEquals(result.verseStart, 16);
+});
+
+Deno.test("BibleService - parseReference - abbreviated 1 Sam", () => {
+  const service = new BibleService();
+  const result = service.parseReference("1 Sam 1:1");
+
+  assertExists(result);
+  assertEquals(result.book, "1 samuel");
+  assertEquals(result.chapter, 1);
+  assertEquals(result.verseStart, 1);
+});
+
+Deno.test("BibleService - parseReference - abbreviated 2 Ki", () => {
+  const service = new BibleService();
+  const result = service.parseReference("2 Ki 5:14");
+
+  assertExists(result);
+  assertEquals(result.book, "2 kings");
+  assertEquals(result.chapter, 5);
+  assertEquals(result.verseStart, 14);
+});
+
+Deno.test("BibleService - parseReference - abbreviated 1 Pet", () => {
+  const service = new BibleService();
+  const result = service.parseReference("1 Pet 1:3");
+
+  assertExists(result);
+  assertEquals(result.book, "1 peter");
+  assertEquals(result.chapter, 1);
+  assertEquals(result.verseStart, 3);
+});
+
+Deno.test("BibleService - parseReference - abbreviated 1 Jn", () => {
+  const service = new BibleService();
+  const result = service.parseReference("1 Jn 1:9");
+
+  assertExists(result);
+  assertEquals(result.book, "1 john");
+  assertEquals(result.chapter, 1);
+  assertEquals(result.verseStart, 9);
+});
+
+Deno.test("BibleService - parseReference - chapter only abbreviated", () => {
+  const service = new BibleService();
+  const result = service.parseReference("1 Cor 13");
+
+  assertExists(result);
+  assertEquals(result.book, "1 corinthians");
+  assertEquals(result.chapter, 13);
+  assertEquals(result.verseStart, undefined);
 });

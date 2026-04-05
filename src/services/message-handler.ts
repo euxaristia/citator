@@ -20,6 +20,112 @@ const CHAPTER_PATTERN =
 // Books that contain "of" in their name
 const BOOKS_WITH_OF = ["song of solomon", "song of songs"];
 
+// Abbreviation to full book name mapping
+// This handles common abbreviations and partial matches
+const ABBREVIATION_MAP: Record<string, string> = {
+  // "1 cor" and "1 corinth" -> "1 corinthians"
+  "1 corinthians": "1 corinthians",
+  "1 corinth": "1 corinthians",
+  "1 cor": "1 corinthians",
+  "2 corinthians": "2 corinthians",
+  "2 corinth": "2 corinthians",
+  "2 cor": "2 corinthians",
+  
+  // Samuel abbreviations
+  "1 samuel": "1 samuel",
+  "1 sam": "1 samuel",
+  "2 samuel": "2 samuel",
+  "2 sam": "2 samuel",
+  
+  // Kings abbreviations
+  "1 kings": "1 kings",
+  "1 ki": "1 kings",
+  "2 kings": "2 kings",
+  "2 ki": "2 kings",
+  
+  // Chronicles abbreviations
+  "1 chronicles": "1 chronicles",
+  "1 ch": "1 chronicles",
+  "2 chronicles": "2 chronicles",
+  "2 ch": "2 chronicles",
+  
+  // Thessalonians abbreviations
+  "1 thessalonians": "1 thessalonians",
+  "1 thes": "1 thessalonians",
+  "2 thessalonians": "2 thessalonians",
+  "2 thes": "2 thessalonians",
+  
+  // Timothy abbreviations
+  "1 timothy": "1 timothy",
+  "1 tim": "1 timothy",
+  "2 timothy": "2 timothy",
+  "2 tim": "2 timothy",
+  
+  // Peter abbreviations
+  "1 peter": "1 peter",
+  "1 pet": "1 peter",
+  "2 peter": "2 peter",
+  "2 pet": "2 peter",
+  
+  // John (epistles) abbreviations
+  "1 john": "1 john",
+  "1 jn": "1 john",
+  "2 john": "2 john",
+  "2 jn": "2 john",
+  "3 john": "3 john",
+  "3 jn": "3 john",
+  
+  // Psalm/Psalms
+  "psalms": "psalms",
+  "psalm": "psalms",
+  
+  // Song of Solomon/Songs
+  "song of solomon": "song of solomon",
+  "song of songs": "song of solomon",
+};
+
+/**
+ * Normalize a book name from abbreviations or partial names to the full canonical name
+ * Returns the normalized name or the original if no mapping exists
+ */
+function normalizeBookName(bookName: string): string {
+  const normalized = bookName.toLowerCase().trim();
+  
+  // Direct match in abbreviation map
+  if (ABBREVIATION_MAP[normalized]) {
+    return ABBREVIATION_MAP[normalized];
+  }
+  
+  // Try prefix matching for partial book names
+  // e.g., "1 corinth" should match "1 corinthians"
+  const candidates = Object.entries(ABBREVIATION_MAP)
+    .filter(([abbrev, full]) => full.startsWith(normalized) || abbrev.startsWith(normalized))
+    .map(([abbrev, full]) => full);
+  
+  // If we have exactly one candidate, use it
+  if (candidates.length === 1) {
+    return candidates[0];
+  }
+  
+  // If we have multiple candidates, prefer the shortest abbreviation
+  if (candidates.length > 1) {
+    const sortedCandidates = candidates.sort((a, b) => {
+      const aMinAbbrev = Object.entries(ABBREVIATION_MAP)
+        .filter(([_, full]) => full === a)[0][0].length;
+      const bMinAbbrev = Object.entries(ABBREVIATION_MAP)
+        .filter(([_, full]) => full === b)[0][0].length;
+      return aMinAbbrev - bMinAbbrev;
+    });
+    return sortedCandidates[0];
+  }
+  
+  // No match found, return the original with proper casing
+  // Use title case for consistency
+  return bookName.trim().split(' ').map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  ).join(' ');
+}
+
 // Version keyword patterns for detecting Bible version from message
 // Maps common user-friendly terms to actual version codes
 const VERSION_KEYWORDS: Record<string, string> = {
@@ -139,6 +245,9 @@ export class MessageHandler {
           }
         }
 
+        // Normalize the book name (convert abbreviations to full names)
+        fullBookName = normalizeBookName(fullBookName);
+
         // Validate that this looks like a real Bible book
         if (this.isValidBook(fullBookName)) {
           detected.push({
@@ -194,6 +303,9 @@ export class MessageHandler {
           fullBookName = (wordBefore[1] + " of " + bookName).trim();
         }
       }
+
+      // Normalize the book name (convert abbreviations to full names)
+      fullBookName = normalizeBookName(fullBookName);
 
       // Validate that this looks like a real Bible book
       if (this.isValidBook(fullBookName)) {
