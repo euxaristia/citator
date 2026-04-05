@@ -686,7 +686,7 @@ Deno.test("MessageHandler - detectVerseReferences - Heb 11:1", () => {
   assertEquals(refs[0].verseStart, 1);
 });
 
-Deno.test("MessageHandler - detectVerseReferences - Isa 53:5", () => {
+Deno.test("MessageHandler - detectVersion - Isa 53:5", () => {
   const bibleService = new BibleService("KJV");
   const handler = new MessageHandler(bibleService, "KJV");
 
@@ -696,4 +696,36 @@ Deno.test("MessageHandler - detectVerseReferences - Isa 53:5", () => {
   assertEquals(refs[0].book.toLowerCase(), "isaiah");
   assertEquals(refs[0].chapter, 53);
   assertEquals(refs[0].verseStart, 5);
+});
+
+Deno.test("MessageHandler - detectVersion - NIV", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const version = handler.detectVersion("Matt 5:44 NIV");
+  assertEquals(version, "NIV");
+});
+
+Deno.test("MessageHandler - detectVersion - ESV", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const version = handler.detectVersion("John 3:16 ESV");
+  assertEquals(version, "ESV");
+});
+
+Deno.test("MessageHandler - detectVersion - NASB", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const version = handler.detectVersion("Rom 8:28 NASB");
+  assertEquals(version, "NASB");
+});
+
+Deno.test("MessageHandler - detectVersion - New International Version", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const version = handler.detectVersion("John 3:16 New International Version");
+  assertEquals(version, "NIV");
 });

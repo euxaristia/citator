@@ -251,6 +251,14 @@ const VERSION_KEYWORDS: Record<string, string> = {
   "kjv": "KJV",
   "king james": "KJV",
   "king james version": "KJV",
+  "niv": "NIV",
+  "new international": "NIV",
+  "new international version": "NIV",
+  "esv": "ESV",
+  "english standard": "ESV",
+  "english standard version": "ESV",
+  "nasb": "NASB",
+  "new american standard": "NASB",
   "web": "WEB",
   "world english": "WEB",
   "bbe": "BBE",
@@ -265,10 +273,13 @@ const VERSION_KEYWORDS: Record<string, string> = {
   "septuagint": "LXX",
 };
 
+// Versions that are copyrighted and not available via free APIs
+const UNAVAILABLE_VERSIONS = ["NIV", "ESV", "NASB"];
+
 // Pattern to detect version keywords after a reference
 // Matches: "Greek NT", "KJV", "Latin", etc. at the end or after whitespace
 // Uses word boundaries to avoid partial matches
-const VERSION_PATTERN = /(?:^|[\s\n,;])(greek\s+nt|greek\s+new\s+testament|sblgnt|sbl|byzantine\s+textform|byzantine|textus\s+receptus|old\s+testament\s+hebrew|hebrew\s+ot|masoretic\s+text|world\s+english|king\s+james\s+version|bible\s+in\s+basic\s+english|douay\s+rheims|wmb\s+british\s+edition|septuagint|latin\s+vulgate|vulgate|westminster|basic\s+english|world\s+english|king\s+james|hebrew|latin|greek|byz|tr|mt|wlc|lxx|kjv|web|bbe|drb|wmb|wmbbe)(?=[\s\n\)\],\.]|$)/i;
+const VERSION_PATTERN = /(?:^|[\s\n,;])(greek\s+nt|greek\s+new\s+testament|sblgnt|sbl|byzantine\s+textform|byzantine|textus\s+receptus|old\s+testament\s+hebrew|hebrew\s+ot|masoretic\s+text|new\s+international\s+version|new\s+international|new\s+american\s+standard|english\s+standard\s+version|english\s+standard|world\s+english|king\s+james\s+version|bible\s+in\s+basic\s+english|douay\s+rheims|wmb\s+british\s+edition|septuagint|latin\s+vulgate|vulgate|westminster|basic\s+english|world\s+english|king\s+james|new\s+international|hebrew|latin|greek|byz|tr|mt|wlc|lxx|kjv|niv|esv|nasb|web|bbe|drb|wmb|wmbbe)(?=[\s\n\)\],\.]|$)/i;
 
 export interface DetectedReference {
   book: string;
@@ -601,7 +612,17 @@ export class MessageHandler {
     }
 
     // Detect version from message content
-    const detectedVersion = this.detectVersion(content);
+    let detectedVersion = this.detectVersion(content);
+
+    // Check if the requested version is unavailable
+    if (detectedVersion && UNAVAILABLE_VERSIONS.includes(detectedVersion)) {
+      const availableVersions = "KJV, WEB, BBE, DRB, WMB";
+      await message.reply(
+        `⚠️ The **${detectedVersion}** translation is copyrighted and not available through free APIs. ` +
+        `Available versions: ${availableVersions}. Showing in **${this.defaultVersion}** instead.`,
+      );
+      detectedVersion = undefined; // Fall back to default
+    }
 
     // For now, only respond to the first reference to avoid spam
     const ref = references[0];
