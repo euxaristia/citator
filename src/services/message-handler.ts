@@ -246,6 +246,7 @@ const VERSION_KEYWORDS: Record<string, string> = {
   "latin": "VULG",
   "vulgate": "VULG",
   "latin vulgate": "VULG",
+  "vulg": "VULG",
 
   // English versions (common ones)
   "kjv": "KJV",
@@ -282,7 +283,7 @@ const UNAVAILABLE_VERSIONS = ["NIV", "ESV", "NASB", "CSB"];
 // Pattern to detect version keywords after a reference
 // Matches: "Greek NT", "KJV", "Latin", etc. at the end or after whitespace
 // Uses word boundaries to avoid partial matches
-const VERSION_PATTERN = /(?:^|[\s\n,;])(greek\s+nt|greek\s+new\s+testament|sblgnt|sbl|byzantine\s+textform|byzantine|textus\s+receptus|old\s+testament\s+hebrew|hebrew\s+ot|masoretic\s+text|new\s+international\s+version|new\s+international|new\s+american\s+standard|christian\s+standard\s+bible|christian\s+standard|english\s+standard\s+version|english\s+standard|world\s+english|king\s+james\s+version|bible\s+in\s+basic\s+english|douay\s+rheims|wmb\s+british\s+edition|septuagint|latin\s+vulgate|vulgate|westminster|basic\s+english|world\s+english|king\s+james|new\s+international|hebrew|latin|greek|byz|tr|mt|wlc|lxx|kjv|niv|esv|nasb|csb|web|bbe|drb|wmb|wmbbe)(?=[\s\n\)\],\.]|$)/i;
+const VERSION_PATTERN = /(?:^|[\s\n,;])(greek\s+nt|greek\s+new\s+testament|sblgnt|sbl|byzantine\s+textform|byzantine|textus\s+receptus|old\s+testament\s+hebrew|hebrew\s+ot|masoretic\s+text|new\s+international\s+version|new\s+international|new\s+american\s+standard|christian\s+standard\s+bible|christian\s+standard|english\s+standard\s+version|english\s+standard|world\s+english|king\s+james\s+version|bible\s+in\s+basic\s+english|douay\s+rheims|wmb\s+british\s+edition|septuagint|latin\s+vulgate|vulgate|vulg|westminster|basic\s+english|world\s+english|king\s+james|new\s+international|hebrew|latin|greek|byz|tr|mt|wlc|lxx|kjv|niv|esv|nasb|csb|web|bbe|drb|wmb|wmbbe)(?=[\s\n\)\],\.]|$)/i;
 
 export interface DetectedReference {
   book: string;
