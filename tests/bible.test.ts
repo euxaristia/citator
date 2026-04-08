@@ -558,7 +558,7 @@ Deno.test("BibleService - getVerses - Wisdom 1:1 (deuterocanonical)", async () =
 
   assertEquals(verses.length, 1);
   assertEquals(verses[0].verse, 1);
-  assertEquals(verses[0].version, "NRSVCE"); // Falls back to NRSVCE for deuterocanonical
+  assertEquals(verses[0].version, "KJV"); // bible-api.com KJV includes apocrypha
 });
 
 Deno.test("BibleService - getVerses - Wisdom 1:1 with VULG", async () => {

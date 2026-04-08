@@ -442,20 +442,18 @@ export class BibleService {
   ): Promise<BibleVerse[]> {
     let v = version || this.defaultVersion;
 
-    // Check if this is a deuterocanonical book
-    const bookCode = bookToCode[book.toLowerCase()];
-    if (bookCode && DEUTEROCANONICAL_CODES.has(bookCode)) {
-      // Deuterocanonical books must use bolls.life with a version that includes them
-      if (!DEUTEROCANONICAL_VERSIONS.includes(v)) {
+    const api = this.getApiForVersion(v);
+
+    // For bolls-only versions, check if deuterocanonical book is supported
+    if (api === "bolls") {
+      const bookCode = bookToCode[book.toLowerCase()];
+      if (bookCode && DEUTEROCANONICAL_CODES.has(bookCode) && !DEUTEROCANONICAL_VERSIONS.includes(v)) {
+        // This bolls-only version doesn't have deuterocanonical books, fall back
         v = DEFAULT_DEUTEROCANONICAL_VERSION;
       }
       return this.getVersesFromBolls(book, chapter, verseStart, verseEnd, v);
     }
-
-    const api = this.getApiForVersion(v);
-    if (api === "bolls") {
-      return this.getVersesFromBolls(book, chapter, verseStart, verseEnd, v);
-    }
+    // bible-api.com versions (KJV, etc.) already include deuterocanonical books
     return this.getVersesFromBibleApi(book, chapter, verseStart, verseEnd, v);
   }
 
@@ -597,8 +595,9 @@ export class BibleService {
       throw new Error(`No verses found for ${book} ${verseRef}`);
     }
 
-    // Get book name from first verse
-    const bookName = filteredVerses[0].book_name || book;
+    // Get book name from first verse (bolls.life doesn't return book_name, so title-case the input)
+    const bookName = filteredVerses[0].book_name ||
+      book.split(" ").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
     return filteredVerses.map((verse: any) => ({
       book: bookName,
