@@ -119,7 +119,7 @@ console.log(`   Default Version: ${DEFAULT_VERSION}`);
 console.log(`   Daily Verse Schedule: ${DAILY_VERSE_SCHEDULE} (${TIMEZONE})`);
 
 // Event: Client Ready
-client.on("clientReady", () => {
+client.on("clientReady", async () => {
   console.log(`✅ Logged in as ${client.user?.username}#${client.user?.discriminator}`);
   console.log(`   ID: ${client.user?.id}`);
   console.log(`   Servers: ${client.guilds.cache.size}`);
