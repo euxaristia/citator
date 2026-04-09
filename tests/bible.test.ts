@@ -569,3 +569,27 @@ Deno.test("BibleService - getVerses - Wisdom 1:1 with VULG", async () => {
   assertEquals(verses[0].verse, 1);
   assertEquals(verses[0].version, "VULG");
 });
+
+Deno.test("BibleService - getVerses - Spanish deuterocanonical does not fall back to English NRSVCE", async () => {
+  const service = new BibleService();
+  // "Sabiduría" (Wisdom) with RV1960 should NOT silently switch to NRSVCE (English)
+  // RV1960 doesn't have deuterocanonical books on bolls.life, so it should fail gracefully
+  // Previously this would silently fall back to NRSVCE and return English text
+  await assertRejects(
+    async () => await service.getVerses("wisdom", 1, 1, undefined, "RV1960"),
+    Error,
+    "No verses found",
+  );
+});
+
+Deno.test("BibleService - getVerses - non-Spanish deuterocanonical still falls back to NRSVCE", async () => {
+  const service = new BibleService();
+  // SBLGNT (Greek NT) goes through bolls but doesn't have deuterocanonical books,
+  // so it should fall back to NRSVCE for Wisdom
+  const verses = await service.getVerses("wisdom", 1, 1, undefined, "SBLGNT");
+
+  assertEquals(verses.length, 1);
+  assertEquals(verses[0].verse, 1);
+  // Should have fallen back to NRSVCE since SBLGNT doesn't have deuterocanonical on bolls
+  assertEquals(verses[0].version, "NRSVCE");
+});

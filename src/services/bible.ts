@@ -577,8 +577,12 @@ export class BibleService {
     if (api === "bolls") {
       const bookCode = bookToCode[book.toLowerCase()];
       if (bookCode && DEUTEROCANONICAL_CODES.has(bookCode) && !DEUTEROCANONICAL_VERSIONS.includes(v)) {
-        // This bolls-only version doesn't have deuterocanonical books, fall back
-        v = DEFAULT_DEUTEROCANONICAL_VERSION;
+        // Don't fall back to English NRSVCE for Spanish requests — let it try the Spanish version
+        // or fail gracefully with a "not found" error in the user's language
+        if (!SPANISH_VERSIONS.includes(v)) {
+          // This bolls-only version doesn't have deuterocanonical books, fall back
+          v = DEFAULT_DEUTEROCANONICAL_VERSION;
+        }
       }
       return this.getVersesFromBolls(book, chapter, verseStart, verseEnd, v);
     }
