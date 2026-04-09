@@ -169,6 +169,9 @@ const codeToId: Record<string, number> = {
 // bolls.life ONLY versions (not in bible-api.com)
 const BOLLS_ONLY_VERSIONS = ["VULG", "WLC", "LXX", "SBLGNT", "BYZ", "MT", "TR"];
 
+// Spanish versions (bolls.life only)
+const SPANISH_VERSIONS = ["RV1960", "NVI", "NTV", "LBLA", "BTX3", "RV2004", "PDT"];
+
 // Deuterocanonical book codes (only available on bolls.life with certain versions)
 const DEUTEROCANONICAL_CODES = new Set(["TOB", "JDT", "WIS", "SIR", "BAR", "1MA", "2MA"]);
 
@@ -355,6 +358,97 @@ const ABBREVIATION_MAP: Record<string, string> = {
   "2 maccabees": "2 maccabees",
   "2 macc": "2 maccabees",
   "2 mac": "2 maccabees",
+
+  // Spanish book names (excluding duplicates with English entries above)
+  "génesis": "genesis",
+  "éxodo": "exodus",
+  "exodo": "exodus",
+  "levítico": "leviticus",
+  "levitico": "leviticus",
+  "números": "numbers",
+  "numeros": "numbers",
+  "deuteronomio": "deuteronomy",
+  "josué": "joshua",
+  "josue": "joshua",
+  "jueces": "judges",
+  "1 reyes": "1 kings",
+  "2 reyes": "2 kings",
+  "1 crónicas": "1 chronicles",
+  "1 cronicas": "1 chronicles",
+  "2 crónicas": "2 chronicles",
+  "2 cronicas": "2 chronicles",
+  "esdras": "ezra",
+  "nehemías": "nehemiah",
+  "nehemias": "nehemiah",
+  "ester": "esther",
+  "salmos": "psalms",
+  "salmo": "psalms",
+  "sal": "psalms",
+  "proverbios": "proverbs",
+  "eclesiastés": "ecclesiastes",
+  "eclesiastes": "ecclesiastes",
+  "cantares": "song of solomon",
+  "cantar de los cantares": "song of solomon",
+  "isaías": "isaiah",
+  "isaias": "isaiah",
+  "jeremías": "jeremiah",
+  "jeremias": "jeremiah",
+  "lamentaciones": "lamentations",
+  "ezequiel": "ezekiel",
+  "oseas": "hosea",
+  "abdías": "obadiah",
+  "abdias": "obadiah",
+  "jonás": "jonah",
+  "jonas": "jonah",
+  "miqueas": "micah",
+  "nahúm": "nahum",
+  "habacuc": "habakkuk",
+  "sofonías": "zephaniah",
+  "sofonias": "zephaniah",
+  "hageo": "haggai",
+  "zacarías": "zechariah",
+  "zacarias": "zechariah",
+  "malaquías": "malachi",
+  "malaquias": "malachi",
+  "mateo": "matthew",
+  "marcos": "mark",
+  "lucas": "luke",
+  "juan": "john",
+  "hechos": "acts",
+  "romanos": "romans",
+  "1 corintios": "1 corinthians",
+  "2 corintios": "2 corinthians",
+  "gálatas": "galatians",
+  "galatas": "galatians",
+  "efesios": "ephesians",
+  "filipenses": "philippians",
+  "colosenses": "colossians",
+  "1 tesalonicenses": "1 thessalonians",
+  "2 tesalonicenses": "2 thessalonians",
+  "1 timoteo": "1 timothy",
+  "2 timoteo": "2 timothy",
+  "tito": "titus",
+  "filemón": "philemon",
+  "filemon": "philemon",
+  "hebreos": "hebrews",
+  "santiago": "james",
+  "1 pedro": "1 peter",
+  "2 pedro": "2 peter",
+  "1 juan": "1 john",
+  "2 juan": "2 john",
+  "3 juan": "3 john",
+  "judas": "jude",
+  "apocalipsis": "revelation",
+
+  // Spanish deuterocanonical
+  "tobías": "tobit",
+  "judit": "judith",
+  "sabiduría": "wisdom",
+  "sabiduria": "wisdom",
+  "eclesiástico": "sirach",
+  "eclesiastico": "sirach",
+  "1 macabeos": "1 maccabees",
+  "2 macabeos": "2 maccabees",
 };
 
 /**
@@ -424,7 +518,7 @@ export class BibleService {
    * bible-api.com for English translations
    */
   private getApiForVersion(version: string): "bible-api" | "bolls" {
-    if (BOLLS_ONLY_VERSIONS.includes(version)) {
+    if (BOLLS_ONLY_VERSIONS.includes(version) || SPANISH_VERSIONS.includes(version)) {
       return "bolls";
     }
     return "bible-api";
@@ -685,7 +779,7 @@ export class BibleService {
    * Get all available Bible versions from both APIs
    */
   async getVersions(): Promise<string[]> {
-    return [...BIBLE_API_VERSIONS, ...BOLLS_ONLY_VERSIONS].filter((v, i, a) => a.indexOf(v) === i);
+    return [...BIBLE_API_VERSIONS, ...BOLLS_ONLY_VERSIONS, ...SPANISH_VERSIONS].filter((v, i, a) => a.indexOf(v) === i);
   }
 
   /**
@@ -749,6 +843,13 @@ export class BibleService {
       "NRSVCE": "New Revised Standard Version Catholic Edition",
       "RSV2CE": "Revised Standard Version 2nd Catholic Edition",
       "NABRE": "New American Bible Revised Edition",
+      "RV1960": "Reina-Valera 1960",
+      "NVI": "Nueva Versión Internacional",
+      "NTV": "Nueva Traducción Viviente",
+      "LBLA": "La Biblia de las Américas",
+      "BTX3": "La Biblia Textual 3ra Edición",
+      "RV2004": "Reina Valera Gómez 2004",
+      "PDT": "Palabra de Dios para Todos",
     };
 
     const versionDisplayName = versionNames[version] || version;
@@ -819,8 +920,8 @@ export class BibleService {
   } | null {
     // Patterns with verse numbers: "John 3:16", "John 3:16-18", "John 3 16-18"
     const versePatterns = [
-      /^([123]?\s?[A-Za-z]+(?:\s+of\s+[A-Za-z]+)?)\s+(\d+):(\d+)(?:-(\d+))?$/,
-      /^([123]?\s?[A-Za-z]+)\s+(\d+)\s+(\d+)(?:-(\d+))?$/,
+      /^([123]?\s?[\p{L}]+(?:\s+(?:of|de\s+los)\s+[\p{L}]+)?)\s+(\d+):(\d+)(?:-(\d+))?$/u,
+      /^([123]?\s?[\p{L}]+)\s+(\d+)\s+(\d+)(?:-(\d+))?$/u,
     ];
 
     for (const pattern of versePatterns) {
@@ -837,7 +938,7 @@ export class BibleService {
     }
 
     // Chapter-only pattern: "John 3", "Psalm 23", "1 John 3"
-    const chapterPattern = /^([123]?\s?[A-Za-z]+(?:\s+of\s+[A-Za-z]+)?)\s+(\d+)$/;
+    const chapterPattern = /^([123]?\s?[\p{L}]+(?:\s+(?:of|de\s+los)\s+[\p{L}]+)?)\s+(\d+)$/u;
     const chapterMatch = ref.match(chapterPattern);
     if (chapterMatch) {
       const [, book, chapter] = chapterMatch;

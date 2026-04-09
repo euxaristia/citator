@@ -33,6 +33,13 @@ export function createCommandDefinitions(): any[] {
     { name: "📜 BYZ (Byzantine Textform)", value: "BYZ" },
     { name: "📜 MT (Masoretic Text)", value: "MT" },
     { name: "📜 TR (Textus Receptus)", value: "TR" },
+    { name: "🇪🇸 RV1960 (Reina-Valera 1960)", value: "RV1960" },
+    { name: "🇪🇸 NVI (Nueva Versión Internacional)", value: "NVI" },
+    { name: "🇪🇸 NTV (Nueva Traducción Viviente)", value: "NTV" },
+    { name: "🇪🇸 LBLA (La Biblia de las Américas)", value: "LBLA" },
+    { name: "🇪🇸 BTX3 (Biblia Textual 3ra Ed.)", value: "BTX3" },
+    { name: "🇪🇸 RV2004 (Reina Valera Gómez)", value: "RV2004" },
+    { name: "🇪🇸 PDT (Palabra de Dios para Todos)", value: "PDT" },
   ];
 
   return [
@@ -273,6 +280,11 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
               value: "VULG, WLC, LXX, SBLGNT, BYZ, MT, TR",
               inline: false,
             },
+            {
+              name: "Español / Spanish (bolls.life)",
+              value: "RV1960, NVI, NTV, LBLA, BTX3, RV2004, PDT",
+              inline: false,
+            },
           )
           .setFooter({ text: "Use /verse with the version parameter to specify a translation" });
 
@@ -309,7 +321,7 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
             },
             {
               name: "Available Versions",
-              value: "KJV, WEB, BBE, DRB, WMB, WMBBE, VULG, WLC, LXX, SBLGNT, BYZ, MT, TR",
+              value: "KJV, WEB, BBE, DRB, WMB, WMBBE, VULG, WLC, LXX, SBLGNT, BYZ, MT, TR\n🇪🇸 RV1960, NVI, NTV, LBLA, BTX3, RV2004, PDT",
               inline: false,
             },
           )
