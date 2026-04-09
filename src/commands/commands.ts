@@ -112,13 +112,15 @@ export function createCommandHandlers(bibleService: BibleService): CommandHandle
         }
 
         try {
-          console.log(`[Command] /verse ${args.reference} ${args.version || "KJV"}`);
+          // Auto-detect Spanish default when no version explicitly chosen
+          const version = args.version || bibleService.detectSpanishDefault(args.reference);
+          console.log(`[Command] /verse ${args.reference} ${version || "KJV"}`);
           const verses = await bibleService.getVerses(
             parsed.book,
             parsed.chapter,
             parsed.verseStart,
             parsed.verseEnd,
-            args.version,
+            version,
           );
 
           if (verses.length === 0) {

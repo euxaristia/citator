@@ -181,6 +181,28 @@ const DEUTEROCANONICAL_VERSIONS = ["NRSVCE", "RSV2CE", "NABRE", "NJB1985", "CEVD
 // Default English version for deuterocanonical books when requested version lacks them
 const DEFAULT_DEUTEROCANONICAL_VERSION = "NRSVCE";
 
+// Default Spanish version when Spanish book names are detected
+const DEFAULT_SPANISH_VERSION = "RV1960";
+
+// Spanish book names for auto-detecting language from raw input
+const SPANISH_BOOK_NAMES = new Set([
+  "génesis", "éxodo", "exodo", "levítico", "levitico", "números", "numeros",
+  "deuteronomio", "josué", "josue", "jueces", "1 reyes", "2 reyes",
+  "1 crónicas", "1 cronicas", "2 crónicas", "2 cronicas", "esdras",
+  "nehemías", "nehemias", "salmos", "salmo", "proverbios",
+  "eclesiastés", "eclesiastes", "cantares", "cantar de los cantares",
+  "isaías", "isaias", "jeremías", "jeremias", "lamentaciones", "ezequiel",
+  "oseas", "abdías", "abdias", "jonás", "jonas", "miqueas", "nahúm",
+  "habacuc", "sofonías", "sofonias", "hageo", "zacarías", "zacarias",
+  "malaquías", "malaquias", "mateo", "marcos", "lucas", "juan", "hechos",
+  "romanos", "1 corintios", "2 corintios", "gálatas", "galatas", "efesios",
+  "filipenses", "colosenses", "1 tesalonicenses", "2 tesalonicenses",
+  "1 timoteo", "2 timoteo", "filemón", "filemon", "hebreos", "santiago",
+  "1 pedro", "2 pedro", "1 juan", "2 juan", "3 juan", "apocalipsis",
+  "tobías", "judit", "sabiduría", "sabiduria", "eclesiástico", "eclesiastico",
+  "1 macabeos", "2 macabeos",
+]);
+
 // bible-api.com versions
 const BIBLE_API_VERSIONS = ["KJV", "WEB", "BBE", "DRB", "WMB", "WMBBE"];
 
@@ -510,6 +532,19 @@ export class BibleService {
 
   constructor(defaultVersion: string = "KJV") {
     this.defaultVersion = defaultVersion;
+  }
+
+  /**
+   * Detect if a raw reference string uses a Spanish book name.
+   * Returns the default Spanish version if so, otherwise undefined.
+   */
+  detectSpanishDefault(reference: string): string | undefined {
+    // Strip chapter:verse from the end to get just the book name
+    const bookPart = reference.replace(/\s+\d+.*$/, "").toLowerCase().trim();
+    if (SPANISH_BOOK_NAMES.has(bookPart)) {
+      return DEFAULT_SPANISH_VERSION;
+    }
+    return undefined;
   }
 
   /**

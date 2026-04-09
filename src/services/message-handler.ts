@@ -20,6 +20,27 @@ const CHAPTER_PATTERN =
 // Books that contain "of" in their name
 const BOOKS_WITH_OF = ["song of solomon", "song of songs", "wisdom of solomon"];
 
+// Spanish book names for auto-detecting language
+const SPANISH_BOOK_NAMES = new Set([
+  "génesis", "éxodo", "exodo", "levítico", "levitico", "números", "numeros",
+  "deuteronomio", "josué", "josue", "jueces", "1 reyes", "2 reyes",
+  "1 crónicas", "1 cronicas", "2 crónicas", "2 cronicas", "esdras",
+  "nehemías", "nehemias", "salmos", "salmo", "proverbios",
+  "eclesiastés", "eclesiastes", "cantares", "cantar de los cantares",
+  "isaías", "isaias", "jeremías", "jeremias", "lamentaciones", "ezequiel",
+  "oseas", "abdías", "abdias", "jonás", "jonas", "miqueas", "nahúm",
+  "habacuc", "sofonías", "sofonias", "hageo", "zacarías", "zacarias",
+  "malaquías", "malaquias", "mateo", "marcos", "lucas", "juan", "hechos",
+  "romanos", "1 corintios", "2 corintios", "gálatas", "galatas", "efesios",
+  "filipenses", "colosenses", "1 tesalonicenses", "2 tesalonicenses",
+  "1 timoteo", "2 timoteo", "filemón", "filemon", "hebreos", "santiago",
+  "1 pedro", "2 pedro", "1 juan", "2 juan", "3 juan", "apocalipsis",
+  "tobías", "judit", "sabiduría", "sabiduria", "eclesiástico", "eclesiastico",
+  "1 macabeos", "2 macabeos",
+]);
+
+const DEFAULT_SPANISH_VERSION = "RV1960";
+
 // Abbreviation to full book name mapping
 // This handles common abbreviations and partial matches
 const ABBREVIATION_MAP: Record<string, string> = {
@@ -875,13 +896,18 @@ export class MessageHandler {
     // For now, only respond to the first reference to avoid spam
     const ref = references[0];
 
+    // If no version explicitly specified, use Spanish default when book name is Spanish
+    const fallbackVersion = (!detectedVersion && SPANISH_BOOK_NAMES.has(ref.originalMatch.replace(/\s+\d+.*$/, "").toLowerCase().trim()))
+      ? DEFAULT_SPANISH_VERSION
+      : this.defaultVersion;
+
     try {
       const verses = await this.bibleService.getVerses(
         ref.book,
         ref.chapter,
         ref.verseStart,
         ref.verseEnd,
-        detectedVersion || this.defaultVersion,
+        detectedVersion || fallbackVersion,
       );
 
       if (verses.length === 0) {
