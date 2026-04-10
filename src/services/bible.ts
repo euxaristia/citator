@@ -1147,7 +1147,9 @@ export class BibleService {
       "PDT": "Palabra de Dios para Todos",
     };
 
-    const versionDisplayName = versionNames[version] || version;
+    const versionDisplayName = (displayVersion && SPANISH_VERSIONS.includes(displayVersion) && version === "VULG")
+      ? "Vulgata Latina"
+      : (versionNames[version] || version);
     const embedTitle = title ? `${title}` : `${reference}`;
 
     // Discord embed description limit is 4096 characters
