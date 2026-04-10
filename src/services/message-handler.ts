@@ -1048,12 +1048,14 @@ export class MessageHandler {
 
     // If no version explicitly specified, detect language from book name
     let fallbackVersion = this.defaultVersion;
+    let displayVersion: string | undefined;
     if (!detectedVersion) {
       const bookPart = ref.originalMatch.replace(/\s+\d+.*$/, "").toLowerCase().trim();
       if (LATIN_BOOK_NAMES.has(bookPart)) {
         fallbackVersion = DEFAULT_LATIN_VERSION;
       } else if (SPANISH_BOOK_NAMES.has(bookPart)) {
-        fallbackVersion = DEFAULT_SPANISH_VERSION;
+        fallbackVersion = DEFAULT_LATIN_VERSION;
+        displayVersion = DEFAULT_SPANISH_VERSION;
       }
     }
 
@@ -1070,7 +1072,7 @@ export class MessageHandler {
         return false;
       }
 
-      const embed = this.bibleService.createVerseEmbed(verses);
+      const embed = this.bibleService.createVerseEmbed(verses, undefined, displayVersion);
       await message.reply({ embeds: [embed] });
       return true;
     } catch (error) {

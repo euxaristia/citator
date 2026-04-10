@@ -1081,11 +1081,11 @@ export class BibleService {
    * Format verses into a display string
    * Discord has a 2000 character limit, so we truncate if needed
    */
-  formatVerses(verses: BibleVerse[], maxCharacters: number = 2000): string {
+  formatVerses(verses: BibleVerse[], maxCharacters: number = 2000, displayVersion?: string): string {
     if (verses.length === 0) return "";
 
     const version = verses[0].version;
-    const reference = this.formatReference(verses);
+    const reference = this.formatReference(verses, displayVersion);
     const fullText = verses.map((v) => v.text).join(" ");
 
     // Build the full message to check length
@@ -1111,13 +1111,13 @@ export class BibleService {
   /**
    * Create a Discord embed for verses
    */
-  createVerseEmbed(verses: BibleVerse[], title?: string): EmbedBuilder {
+  createVerseEmbed(verses: BibleVerse[], title?: string, displayVersion?: string): EmbedBuilder {
     if (verses.length === 0) {
       return new EmbedBuilder().setColor(0x5865F2).setDescription("No verses found.");
     }
 
     const version = verses[0].version;
-    const reference = this.formatReference(verses);
+    const reference = this.formatReference(verses, displayVersion);
     let fullText = verses.map((v) => v.text).join(" ");
 
     // Version display names
@@ -1177,12 +1177,14 @@ export class BibleService {
 
   /**
    * Get the display name for a book, localized to the version's language.
+   * If displayVersion is provided, use it instead of the verse version for localization.
    */
-  private getBookDisplayName(book: string, version: string): string {
-    if (SPANISH_VERSIONS.includes(version)) {
+  private getBookDisplayName(book: string, version: string, displayVersion?: string): string {
+    const effectiveVersion = displayVersion || version;
+    if (SPANISH_VERSIONS.includes(effectiveVersion)) {
       return ENGLISH_TO_SPANISH_BOOK[book.toLowerCase()] || book;
     }
-    if (version === "VULG") {
+    if (effectiveVersion === "VULG") {
       return ENGLISH_TO_LATIN_BOOK[book.toLowerCase()] || book;
     }
     // Title-case for English versions
@@ -1192,13 +1194,13 @@ export class BibleService {
   /**
    * Format a reference string from verses
    */
-  private formatReference(verses: BibleVerse[]): string {
+  private formatReference(verses: BibleVerse[], displayVersion?: string): string {
     if (verses.length === 0) return "";
     const version = verses[0].version;
     const first = verses[0];
     const last = verses[verses.length - 1];
-    const firstBook = this.getBookDisplayName(first.book, version);
-    const lastBook = first.book === last.book ? firstBook : this.getBookDisplayName(last.book, version);
+    const firstBook = this.getBookDisplayName(first.book, version, displayVersion);
+    const lastBook = first.book === last.book ? firstBook : this.getBookDisplayName(last.book, version, displayVersion);
 
     if (verses.length === 1) {
       return `${firstBook} ${first.chapter}:${first.verse}`;
