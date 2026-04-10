@@ -593,3 +593,70 @@ Deno.test("BibleService - getVerses - non-Spanish deuterocanonical still falls b
   // Should have fallen back to NRSVCE since SBLGNT doesn't have deuterocanonical on bolls
   assertEquals(verses[0].version, "NRSVCE");
 });
+
+Deno.test("BibleService - createVerseEmbed - Spanish version uses Spanish book name", () => {
+  const service = new BibleService();
+  // When the version is RV1960, the embed title/footer should use Spanish book names
+  const verses = [{
+    book: "psalms",
+    chapter: 58,
+    verse: 1,
+    text: "Oh congregación, ¿pronunciáis en verdad justicia?",
+    version: "RV1960",
+    reference: "Salmos 58:1",
+  }];
+
+  const embed = service.createVerseEmbed(verses);
+  const json = embed.toJSON();
+
+  // Title should be "Salmos 58:1" not "Psalms 58:1"
+  assertEquals(json.title, "Salmos 58:1");
+  // Footer should use Spanish book name
+  assertEquals(json.footer?.text, "Salmos 58:1 - Reina-Valera 1960");
+});
+
+Deno.test("BibleService - createVerseEmbed - English version uses English book name", () => {
+  const service = new BibleService();
+  const verses = [{
+    book: "psalms",
+    chapter: 23,
+    verse: 1,
+    text: "The Lord is my shepherd",
+    version: "KJV",
+    reference: "Psalms 23:1",
+  }];
+
+  const embed = service.createVerseEmbed(verses);
+  const json = embed.toJSON();
+
+  assertEquals(json.title, "Psalms 23:1");
+  assertEquals(json.footer?.text, "Psalms 23:1 - King James Version");
+});
+
+Deno.test("BibleService - createVerseEmbed - multi-verse Spanish range", () => {
+  const service = new BibleService();
+  const verses = [
+    {
+      book: "genesis",
+      chapter: 1,
+      verse: 1,
+      text: "En el principio creó Dios",
+      version: "RV1960",
+      reference: "Génesis 1:1",
+    },
+    {
+      book: "genesis",
+      chapter: 1,
+      verse: 2,
+      text: "Y la tierra estaba desordenada",
+      version: "RV1960",
+      reference: "Génesis 1:2",
+    },
+  ];
+
+  const embed = service.createVerseEmbed(verses);
+  const json = embed.toJSON();
+
+  assertEquals(json.title, "Génesis 1:1-2");
+  assertEquals(json.footer?.text, "Génesis 1:1-2 - Reina-Valera 1960");
+});

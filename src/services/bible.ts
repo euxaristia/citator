@@ -203,6 +203,83 @@ const SPANISH_BOOK_NAMES = new Set([
   "1 macabeos", "2 macabeos",
 ]);
 
+// Reverse mapping: English book name → Spanish display name
+const ENGLISH_TO_SPANISH_BOOK: Record<string, string> = {
+  "genesis": "Génesis",
+  "exodus": "Éxodo",
+  "leviticus": "Levítico",
+  "numbers": "Números",
+  "deuteronomy": "Deuteronomio",
+  "joshua": "Josué",
+  "judges": "Jueces",
+  "ruth": "Rut",
+  "1 samuel": "1 Samuel",
+  "2 samuel": "2 Samuel",
+  "1 kings": "1 Reyes",
+  "2 kings": "2 Reyes",
+  "1 chronicles": "1 Crónicas",
+  "2 chronicles": "2 Crónicas",
+  "ezra": "Esdras",
+  "nehemiah": "Nehemías",
+  "esther": "Ester",
+  "job": "Job",
+  "psalms": "Salmos",
+  "proverbs": "Proverbios",
+  "ecclesiastes": "Eclesiastés",
+  "song of solomon": "Cantares",
+  "isaiah": "Isaías",
+  "jeremiah": "Jeremías",
+  "lamentations": "Lamentaciones",
+  "ezekiel": "Ezequiel",
+  "daniel": "Daniel",
+  "hosea": "Oseas",
+  "joel": "Joel",
+  "amos": "Amós",
+  "obadiah": "Abdías",
+  "jonah": "Jonás",
+  "micah": "Miqueas",
+  "nahum": "Nahúm",
+  "habakkuk": "Habacuc",
+  "zephaniah": "Sofonías",
+  "haggai": "Hageo",
+  "zechariah": "Zacarías",
+  "malachi": "Malaquías",
+  "matthew": "Mateo",
+  "mark": "Marcos",
+  "luke": "Lucas",
+  "john": "Juan",
+  "acts": "Hechos",
+  "romans": "Romanos",
+  "1 corinthians": "1 Corintios",
+  "2 corinthians": "2 Corintios",
+  "galatians": "Gálatas",
+  "ephesians": "Efesios",
+  "philippians": "Filipenses",
+  "colossians": "Colosenses",
+  "1 thessalonians": "1 Tesalonicenses",
+  "2 thessalonians": "2 Tesalonicenses",
+  "1 timothy": "1 Timoteo",
+  "2 timothy": "2 Timoteo",
+  "titus": "Tito",
+  "philemon": "Filemón",
+  "hebrews": "Hebreos",
+  "james": "Santiago",
+  "1 peter": "1 Pedro",
+  "2 peter": "2 Pedro",
+  "1 john": "1 Juan",
+  "2 john": "2 Juan",
+  "3 john": "3 Juan",
+  "jude": "Judas",
+  "revelation": "Apocalipsis",
+  "tobit": "Tobías",
+  "judith": "Judit",
+  "wisdom": "Sabiduría",
+  "sirach": "Eclesiástico",
+  "baruch": "Baruc",
+  "1 maccabees": "1 Macabeos",
+  "2 maccabees": "2 Macabeos",
+};
+
 // bible-api.com versions
 const BIBLE_API_VERSIONS = ["KJV", "WEB", "BBE", "DRB", "WMB", "WMBBE"];
 
@@ -920,22 +997,36 @@ export class BibleService {
   }
 
   /**
+   * Get the display name for a book, localized to the version's language.
+   */
+  private getBookDisplayName(book: string, version: string): string {
+    if (SPANISH_VERSIONS.includes(version)) {
+      return ENGLISH_TO_SPANISH_BOOK[book.toLowerCase()] || book;
+    }
+    // Title-case for English versions
+    return book.split(" ").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  }
+
+  /**
    * Format a reference string from verses
    */
   private formatReference(verses: BibleVerse[]): string {
     if (verses.length === 0) return "";
-    if (verses.length === 1) {
-      return `${verses[0].book} ${verses[0].chapter}:${verses[0].verse}`;
-    }
-
+    const version = verses[0].version;
     const first = verses[0];
     const last = verses[verses.length - 1];
+    const firstBook = this.getBookDisplayName(first.book, version);
+    const lastBook = first.book === last.book ? firstBook : this.getBookDisplayName(last.book, version);
 
-    if (first.book === last.book && first.chapter === last.chapter) {
-      return `${first.book} ${first.chapter}:${first.verse}-${last.verse}`;
+    if (verses.length === 1) {
+      return `${firstBook} ${first.chapter}:${first.verse}`;
     }
 
-    return `${first.book} ${first.chapter}:${first.verse} - ${last.book} ${last.chapter}:${last.verse}`;
+    if (first.book === last.book && first.chapter === last.chapter) {
+      return `${firstBook} ${first.chapter}:${first.verse}-${last.verse}`;
+    }
+
+    return `${firstBook} ${first.chapter}:${first.verse} - ${lastBook} ${last.chapter}:${last.verse}`;
   }
 
   /**
