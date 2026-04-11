@@ -10,7 +10,7 @@ import { BibleService, BibleVerse } from "./bible.ts";
 // Matches formats like: John 3:16, Psalm 23:1-6, 1 John 3:16, 2 Corinthians 5:17, Song of Solomon 2:3, John 3
 const VERSE_PATTERNS = [
   // With verse: Book Chapter:Verse[-End]
-  /(?:^|[\s\n\(\[])((?:1|2|3)\s+)?([\p{L}]+(?:\s+(?:of|de\s+los)\s+[\p{L}]+)?)(\s+)(\d+):(\d+)(?:-(\d+))?([\s\n\)\],\.]|$)/giu,
+  /(?:^|[\s\n\(\[])((?:1|2|3)\s+)?([\p{L}]+(?:\s+(?:of|de\s+los)\s+[\p{L}]+)?)(\s+)(\d+)[:;](\d+)(?:-(\d+))?([\s\n\)\],\.]|$)/giu,
 ];
 
 // Chapter-only pattern: Book Chapter (no colon/verse)
@@ -1043,44 +1043,47 @@ export class MessageHandler {
       detectedVersion = undefined; // Fall back to default
     }
 
-    // For now, only respond to the first reference to avoid spam
-    const ref = references[0];
+    // Respond to up to 5 references to avoid spam
+    const embeds = [];
+    for (const ref of references.slice(0, 5)) {
+      // If no version explicitly specified, detect language from book name
+      let fallbackVersion = this.defaultVersion;
+      let displayVersion: string | undefined;
+      if (!detectedVersion) {
+        const bookPart = ref.originalMatch.replace(/\s+\d+.*$/, "").toLowerCase().trim();
+        if (LATIN_BOOK_NAMES.has(bookPart)) {
+          fallbackVersion = DEFAULT_LATIN_VERSION;
+        } else if (SPANISH_BOOK_NAMES.has(bookPart)) {
+          fallbackVersion = DEFAULT_LATIN_VERSION;
+          displayVersion = DEFAULT_SPANISH_VERSION;
+        }
+      }
 
-    // If no version explicitly specified, detect language from book name
-    let fallbackVersion = this.defaultVersion;
-    let displayVersion: string | undefined;
-    if (!detectedVersion) {
-      const bookPart = ref.originalMatch.replace(/\s+\d+.*$/, "").toLowerCase().trim();
-      if (LATIN_BOOK_NAMES.has(bookPart)) {
-        fallbackVersion = DEFAULT_LATIN_VERSION;
-      } else if (SPANISH_BOOK_NAMES.has(bookPart)) {
-        fallbackVersion = DEFAULT_LATIN_VERSION;
-        displayVersion = DEFAULT_SPANISH_VERSION;
+      try {
+        const verses = await this.bibleService.getVerses(
+          ref.book,
+          ref.chapter,
+          ref.verseStart,
+          ref.verseEnd,
+          detectedVersion || fallbackVersion,
+        );
+
+        if (verses.length > 0) {
+          embeds.push(this.bibleService.createVerseEmbed(verses, undefined, displayVersion));
+        }
+      } catch (error) {
+        console.error(
+          `[MessageHandler] Error fetching verse:`,
+          error instanceof Error ? error.message : error,
+        );
       }
     }
 
-    try {
-      const verses = await this.bibleService.getVerses(
-        ref.book,
-        ref.chapter,
-        ref.verseStart,
-        ref.verseEnd,
-        detectedVersion || fallbackVersion,
-      );
-
-      if (verses.length === 0) {
-        return false;
-      }
-
-      const embed = this.bibleService.createVerseEmbed(verses, undefined, displayVersion);
-      await message.reply({ embeds: [embed] });
-      return true;
-    } catch (error) {
-      console.error(
-        `[MessageHandler] Error fetching verse:`,
-        error instanceof Error ? error.message : error,
-      );
+    if (embeds.length === 0) {
       return false;
     }
+
+    await message.reply({ embeds });
+    return true;
   }
 }
