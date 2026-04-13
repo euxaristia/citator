@@ -503,6 +503,7 @@ const ABBREVIATION_MAP: Record<string, string> = {
   "iob": "job",
   "psalmi": "psalms",
   "psalmus": "psalms",
+  "psalmos": "psalms",
   "proverbia": "proverbs",
   "canticum canticorum": "song of solomon",
   "ieremias": "jeremiah",
