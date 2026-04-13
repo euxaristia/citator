@@ -185,7 +185,7 @@ const LATIN_BOOK_NAMES = new Set([
   "numeri", "deuteronomium", "iosue", "iudicum",
   "i regum", "ii regum", "iii regum", "iv regum",
   "i paralipomenon", "ii paralipomenon", "esdrae", "nehemiae",
-  "iob", "psalmi", "psalmus", "proverbia",
+  "iob", "psalmi", "psalmus", "psalmos", "proverbia",
   "canticum canticorum", "isaias", "ieremias", "threni", "ezechiel",
   "osee", "ioel", "abdias", "ionas", "michaeas",
   "habacuc", "sophonias", "aggaeus", "zacharias", "malachias",
