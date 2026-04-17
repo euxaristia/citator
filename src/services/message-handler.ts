@@ -211,12 +211,13 @@ export class MessageHandler {
         const chapter = parseInt(match[4]);
         const verseStart = parseInt(match[5]);
         const verseEnd = match[6] ? parseInt(match[6]) : undefined;
-        const fullMatch = match[0].trim();
 
         // Skip references embedded in conversational messages
-        if (this.isEmbeddedInConversation(content, match.index, fullMatch.length)) {
+        if (this.isEmbeddedInConversation(content, match.index, match[0].length)) {
           continue;
         }
+
+        const fullMatch = match[0].trim();
 
         // Reconstruct full book name
         let fullBookName = (prefix + bookName).trim();
@@ -268,10 +269,11 @@ export class MessageHandler {
     const beforeText = content.substring(0, matchIndex).trim();
     const afterText = content.substring(matchIndex + matchLength).trim();
 
-    // Remove any verse references from the surrounding text before counting words
+    // Remove any verse or chapter references from surrounding text before counting words
     // This prevents "John 3:16 and" from counting as 3 words before "Romans 8:28"
-    const beforeWithoutRefs = beforeText.replace(/\d+[:;]\d+(?:-\d+)?/g, "").trim();
-    const afterWithoutRefs = afterText.replace(/\d+[:;]\d+(?:-\d+)?/g, "").trim();
+    const refStripPattern = /(?:^|[\s\n\(\[])(?:(?:1|2|3)\s+)?[\p{L}]+(?:\s+(?:of|de\s+los)\s+[\p{L}]+)?(?:\s+\d+[:;]\d+(?:-\d+)?|\s+\d+)([\s\n\)\],\.]|$)/giu;
+    const beforeWithoutRefs = beforeText.replace(refStripPattern, " ").trim();
+    const afterWithoutRefs = afterText.replace(refStripPattern, " ").trim();
 
     const wordsBefore = beforeWithoutRefs.split(/\s+/).filter(w => w.length > 0).length;
     const wordsAfter = afterWithoutRefs.split(/\s+/).filter(w => w.length > 0).length;
@@ -295,12 +297,13 @@ export class MessageHandler {
       const prefix = match[1] || ""; // "1", "2", "3", or ""
       const bookName = match[2];
       const chapter = parseInt(match[4]);
-      const fullMatch = match[0].trim();
 
       // Skip references embedded in conversational messages
-      if (this.isEmbeddedInConversation(content, match.index, fullMatch.length)) {
+      if (this.isEmbeddedInConversation(content, match.index, match[0].length)) {
         continue;
       }
+
+      const fullMatch = match[0].trim();
 
       // Reconstruct full book name
       let fullBookName = (prefix + bookName).trim();
