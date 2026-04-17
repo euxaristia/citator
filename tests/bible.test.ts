@@ -680,3 +680,15 @@ Deno.test("BibleService - createVerseEmbed - multi-verse Spanish range", () => {
   assertEquals(json.title, "Génesis 1:1-2");
   assertEquals(json.footer?.text, "Génesis 1:1-2 - Reina-Valera 1960");
 });
+
+Deno.test("BibleService - getVerses - SBLGNT falls back to TR when empty", async () => {
+  const service = new BibleService();
+  // SBLGNT returns empty data from bolls.life, should fall back to TR
+  const verses = await service.getVerses("john", 1, 1, undefined, "SBLGNT");
+
+  assertEquals(verses.length, 1);
+  assertEquals(verses[0].verse, 1);
+  assertEquals(verses[0].chapter, 1);
+  // Version should be TR after fallback
+  assertEquals(verses[0].version, "TR");
+});

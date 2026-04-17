@@ -181,7 +181,7 @@ const DEUTEROCANONICAL_VERSIONS = ["NRSVCE", "RSV2CE", "NABRE", "NJB1985", "CEVD
 // Latin book names for auto-detecting language from raw input
 // Excludes books that have the same name in English (genesis, exodus, leviticus, ruth,
 // esther, ecclesiastes, daniel, amos, nahum, baruch) — those default to English.
-const LATIN_BOOK_NAMES = new Set([
+export const LATIN_BOOK_NAMES = new Set([
   "numeri", "deuteronomium", "iosue", "iudicum",
   "i regum", "ii regum", "iii regum", "iv regum",
   "i paralipomenon", "ii paralipomenon", "esdrae", "nehemiae",
@@ -201,16 +201,16 @@ const LATIN_BOOK_NAMES = new Set([
 ]);
 
 // Default Latin version when Latin book names are detected
-const DEFAULT_LATIN_VERSION = "VULG";
+export const DEFAULT_LATIN_VERSION = "VULG";
 
 // Default English version for deuterocanonical books when requested version lacks them
 const DEFAULT_DEUTEROCANONICAL_VERSION = "NRSVCE";
 
 // Default Spanish version when Spanish book names are detected
-const DEFAULT_SPANISH_VERSION = "RV1960";
+export const DEFAULT_SPANISH_VERSION = "RV1960";
 
 // Spanish book names for auto-detecting language from raw input
-const SPANISH_BOOK_NAMES = new Set([
+export const SPANISH_BOOK_NAMES = new Set([
   "génesis", "éxodo", "exodo", "levítico", "levitico", "números", "numeros",
   "deuteronomio", "josué", "josue", "jueces", "1 reyes", "2 reyes",
   "1 crónicas", "1 cronicas", "2 crónicas", "2 cronicas", "esdras",
@@ -386,7 +386,7 @@ const ENGLISH_TO_SPANISH_BOOK: Record<string, string> = {
 const BIBLE_API_VERSIONS = ["KJV", "WEB", "BBE", "DRB", "WMB", "WMBBE"];
 
 // Abbreviation to full book name mapping for parseReference
-const ABBREVIATION_MAP: Record<string, string> = {
+export const ABBREVIATION_MAP: Record<string, string> = {
   // Pentateuch
   "genesis": "genesis",
   "gen": "genesis",
@@ -634,6 +634,7 @@ const ABBREVIATION_MAP: Record<string, string> = {
   "josué": "joshua",
   "josue": "joshua",
   "jueces": "judges",
+  "rut": "ruth",
   "1 reyes": "1 kings",
   "2 reyes": "2 kings",
   "1 crónicas": "1 chronicles",
@@ -978,6 +979,11 @@ export class BibleService {
     }
 
     if (filteredVerses.length === 0) {
+      // SBLGNT and BYZ have no data on bolls.life, fall back to TR (Textus Receptus)
+      if (v === "SBLGNT" || v === "BYZ") {
+        console.log(`[BollsAPI] ${v} returned no data, falling back to TR`);
+        return this.getVersesFromBolls(book, chapter, verseStart, verseEnd, "TR");
+      }
       const verseRef = verseStart !== undefined
         ? `${chapter}:${verseStart}${verseEnd ? `-${verseEnd}` : ""}`
         : `${chapter}`;
