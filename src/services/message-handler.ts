@@ -213,6 +213,11 @@ export class MessageHandler {
         const verseEnd = match[6] ? parseInt(match[6]) : undefined;
         const fullMatch = match[0].trim();
 
+        // Skip references embedded in conversational messages
+        if (this.isEmbeddedInConversation(content, match.index, fullMatch.length)) {
+          continue;
+        }
+
         // Reconstruct full book name
         let fullBookName = (prefix + bookName).trim();
 
@@ -256,6 +261,26 @@ export class MessageHandler {
   }
 
   /**
+   * Check if a verse reference is embedded in conversational text
+   * Returns true if there is significant text both before AND after the reference
+   */
+  private isEmbeddedInConversation(content: string, matchIndex: number, matchLength: number): boolean {
+    const beforeText = content.substring(0, matchIndex).trim();
+    const afterText = content.substring(matchIndex + matchLength).trim();
+
+    // Remove any verse references from the surrounding text before counting words
+    // This prevents "John 3:16 and" from counting as 3 words before "Romans 8:28"
+    const beforeWithoutRefs = beforeText.replace(/\d+[:;]\d+(?:-\d+)?/g, "").trim();
+    const afterWithoutRefs = afterText.replace(/\d+[:;]\d+(?:-\d+)?/g, "").trim();
+
+    const wordsBefore = beforeWithoutRefs.split(/\s+/).filter(w => w.length > 0).length;
+    const wordsAfter = afterWithoutRefs.split(/\s+/).filter(w => w.length > 0).length;
+
+    // Consider it embedded if there are 3+ words before AND 3+ words after
+    return wordsBefore >= 3 && wordsAfter >= 3;
+  }
+
+  /**
    * Detect chapter-only references like "John 3"
    * Returns detected references or empty array if none found
    */
@@ -271,6 +296,11 @@ export class MessageHandler {
       const bookName = match[2];
       const chapter = parseInt(match[4]);
       const fullMatch = match[0].trim();
+
+      // Skip references embedded in conversational messages
+      if (this.isEmbeddedInConversation(content, match.index, fullMatch.length)) {
+        continue;
+      }
 
       // Reconstruct full book name
       let fullBookName = (prefix + bookName).trim();

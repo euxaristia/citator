@@ -822,3 +822,88 @@ Deno.test("MessageHandler - detectChapterReferences - Wisdom 1", () => {
   assertEquals(refs[0].book.toLowerCase(), "wisdom");
   assertEquals(refs[0].chapter, 1);
 });
+
+// Embedded reference tests - should NOT detect references in conversational messages
+Deno.test("MessageHandler - detectVerseReferences - ignores embedded reference with text before and after", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("I really like John 3:16 because it shows God's love.");
+
+  assertEquals(refs.length, 0);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - ignores embedded reference in longer message", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("The pastor mentioned Romans 8:28 in his sermon today.");
+
+  assertEquals(refs.length, 0);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - detects reference with minimal surrounding text", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("Read John 3:16 today");
+
+  assertEquals(refs.length, 1);
+  assertEquals(refs[0].book.toLowerCase(), "john");
+  assertEquals(refs[0].chapter, 3);
+  assertEquals(refs[0].verseStart, 16);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - detects reference at start", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("John 3:16 is about God's love");
+
+  assertEquals(refs.length, 1);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - detects reference at end", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("My favorite verse is John 3:16");
+
+  assertEquals(refs.length, 1);
+});
+
+Deno.test("MessageHandler - detectChapterReferences - ignores embedded chapter reference", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectChapterReferences("The sermon on John 3 was really good today");
+
+  assertEquals(refs.length, 0);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - detects standalone reference", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("John 3:16");
+
+  assertEquals(refs.length, 1);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - detects reference with short prefix", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("See John 3:16");
+
+  assertEquals(refs.length, 1);
+});
+
+Deno.test("MessageHandler - detectVerseReferences - ignores embedded reference with many words before and after", () => {
+  const bibleService = new BibleService("KJV");
+  const handler = new MessageHandler(bibleService, "KJV");
+
+  const refs = handler.detectVerseReferences("I was reading through the Bible and came across Psalm 23:1 which is beautiful to read");
+
+  assertEquals(refs.length, 0);
+});
