@@ -211,6 +211,12 @@ export class MessageHandler {
         const chapter = parseInt(match[4]);
         const verseStart = parseInt(match[5]);
         const verseEnd = match[6] ? parseInt(match[6]) : undefined;
+
+        // Skip references embedded in conversational messages
+        if (this.isEmbeddedInConversation(content, match.index, match[0].length)) {
+          continue;
+        }
+
         const fullMatch = match[0].trim();
 
         // Reconstruct full book name
@@ -256,6 +262,27 @@ export class MessageHandler {
   }
 
   /**
+   * Check if a verse reference is embedded in conversational text
+   * Returns true if there is significant text both before AND after the reference
+   */
+  private isEmbeddedInConversation(content: string, matchIndex: number, matchLength: number): boolean {
+    const beforeText = content.substring(0, matchIndex).trim();
+    const afterText = content.substring(matchIndex + matchLength).trim();
+
+    // Remove any verse or chapter references from surrounding text before counting words
+    // This prevents "John 3:16 and" from counting as 3 words before "Romans 8:28"
+    const refStripPattern = /(?:^|[\s\n\(\[])(?:(?:1|2|3)\s+)?[\p{L}]+(?:\s+(?:of|de\s+los)\s+[\p{L}]+)?(?:\s+\d+[:;]\d+(?:-\d+)?|\s+\d+)([\s\n\)\],\.]|$)/giu;
+    const beforeWithoutRefs = beforeText.replace(refStripPattern, " ").trim();
+    const afterWithoutRefs = afterText.replace(refStripPattern, " ").trim();
+
+    const wordsBefore = beforeWithoutRefs.split(/\s+/).filter(w => w.length > 0).length;
+    const wordsAfter = afterWithoutRefs.split(/\s+/).filter(w => w.length > 0).length;
+
+    // Consider it embedded if there are 3+ words before AND 3+ words after
+    return wordsBefore >= 3 && wordsAfter >= 3;
+  }
+
+  /**
    * Detect chapter-only references like "John 3"
    * Returns detected references or empty array if none found
    */
@@ -270,6 +297,12 @@ export class MessageHandler {
       const prefix = match[1] || ""; // "1", "2", "3", or ""
       const bookName = match[2];
       const chapter = parseInt(match[4]);
+
+      // Skip references embedded in conversational messages
+      if (this.isEmbeddedInConversation(content, match.index, match[0].length)) {
+        continue;
+      }
+
       const fullMatch = match[0].trim();
 
       // Reconstruct full book name
