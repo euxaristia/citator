@@ -979,6 +979,11 @@ export class BibleService {
     }
 
     if (filteredVerses.length === 0) {
+      // SBLGNT and BYZ have no data on bolls.life, fall back to TR (Textus Receptus)
+      if (v === "SBLGNT" || v === "BYZ") {
+        console.log(`[BollsAPI] ${v} returned no data, falling back to TR`);
+        return this.getVersesFromBolls(book, chapter, verseStart, verseEnd, "TR");
+      }
       const verseRef = verseStart !== undefined
         ? `${chapter}:${verseStart}${verseEnd ? `-${verseEnd}` : ""}`
         : `${chapter}`;
